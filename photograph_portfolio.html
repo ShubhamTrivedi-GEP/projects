@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emma Wilson Photography</title>
+    <meta name="description" content="Emma Wilson Photography - Professional photographer specializing in nature, portrait, architecture and travel photography.">
+    <!-- Image licensing -->
+    <link rel="license" href="https://unsplash.com/license">
+    <meta name="image-source" content="Unsplash">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              'serif': ['Cormorant Garamond', 'serif'],
+              'sans': ['Montserrat', 'sans-serif'],
+            },
+            colors: {
+              'dark': '#1a1a1a',
+              'light': '#f8f8f8',
+              'accent': '#8c7851',
+              'accent-light': '#a99b76',
+            }
+          }
+        }
+      }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">    <style>
+        /* Base font settings */
+        body {
+            font-family: 'Montserrat', sans-serif;
+            letter-spacing: 0.01em;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+        }
+        
+        /* Custom styles that extend Tailwind */
+        .transition-opacity {
+            transition: opacity 0.5s ease-in-out;
+        }
+        .section-heading {
+            position: relative;
+        }
+        .section-heading::after {
+            content: "";
+            position: absolute;
+            bottom: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 2px;
+            background-color: #8c7851;
+        }
+        .gallery-item {
+            transition: all 0.4s ease;
+        }
+        .gallery-item:hover {
+            transform: scale(1.03);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+        .gallery-item::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0) 70%, rgba(0,0,0,0.4) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .gallery-item:hover::after {
+            opacity: 1;
+        }
+        .fullscreen-slider {
+            z-index: 50;
+            background-color: rgba(0,0,0,0.95);
+        }
+        .slide-transition {
+            transition: transform 0.5s ease;
+        }
+        .btn-primary {
+            background-color: #8c7851;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.25rem;
+            transition: all 0.3s ease;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .btn-primary:hover {
+            background-color: #6d5d3d;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        /* Form styling */
+        input, textarea {
+            transition: all 0.3s ease;
+        }
+        input:focus, textarea:focus {
+            border-color: #8c7851;
+            box-shadow: 0 0 0 3px rgba(140, 120, 81, 0.2);
+        }
+        
+        /* Loading animation for lazy-loaded images */
+        .lazy-image {
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .lazy-image-loaded {
+            opacity: 1;
+        }
+        .image-placeholder {
+            background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
+            background-size: 200% 100%;
+            animation: 1.5s shine linear infinite;
+        }
+        @keyframes shine {
+            to {
+                background-position-x: -200%;
+            }
+        }
+        
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #8c7851;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6d5d3d;
+        }
+          /* Skip to content link for accessibility */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: #000;
+            color: white;
+            padding: 8px;
+            z-index: 100;
+            transition: top 0.3s;
+        }
+        .skip-link:focus {
+            top: 0;
+        }
+        
+        /* Custom underline animation for nav links */
+        .nav-link {
+            position: relative;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: #8c7851;
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after, .nav-link.active::after {
+            width: 100%;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-light font-sans text-dark">
+    <!-- Skip to content link for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- Navbar -->
+    <nav class="fixed top-0 w-full bg-white bg-opacity-95 z-40 shadow-sm">
+        <div class="container mx-auto px-4 py-5 flex justify-between items-center">
+            <a href="#" class="text-3xl font-serif tracking-wide font-light">Emma Wilson <span class="text-accent">Photography</span></a>
+            <div class="hidden md:flex space-x-10">
+                <a href="#home" class="nav-link text-sm uppercase tracking-widest hover:text-accent transition-colors">Home</a>
+                <a href="#gallery" class="nav-link text-sm uppercase tracking-widest hover:text-accent transition-colors">Gallery</a>
+                <a href="#about" class="nav-link text-sm uppercase tracking-widest hover:text-accent transition-colors">About</a>
+                <a href="#contact" class="nav-link text-sm uppercase tracking-widest hover:text-accent transition-colors">Contact</a>
+            </div>            <button id="mobile-menu-button" class="md:hidden text-accent focus:outline-none focus:ring-2 focus:ring-accent p-2" aria-label="Toggle menu" aria-expanded="false" aria-controls="mobile-menu">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+        </div>
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white w-full absolute shadow-lg" role="menu" aria-labelledby="mobile-menu-button">
+            <div class="container mx-auto px-4 py-2 flex flex-col space-y-3">
+                <a href="#home" class="block py-2 hover:bg-gray-100 transition-colors" role="menuitem">Home</a>
+                <a href="#gallery" class="block py-2 hover:bg-gray-100 transition-colors" role="menuitem">Gallery</a>
+                <a href="#about" class="block py-2 hover:bg-gray-100 transition-colors" role="menuitem">About</a>
+                <a href="#contact" class="block py-2 hover:bg-gray-100 transition-colors" role="menuitem">Contact</a>
+            </div>
+        </div>
+    </nav>    <!-- Hero Section -->
+    <section id="home" class="h-screen flex items-center justify-center bg-cover bg-center relative" style="background-image: url('https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=1920&h=1080&auto=format&fit=crop&q=80');">
+        <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+        <div id="main-content" class="relative z-10 text-center text-white px-4">
+            <p class="text-sm uppercase tracking-[0.3em] mb-4 font-sans">Fine Art Photography</p>
+            <h1 class="text-4xl md:text-7xl font-serif font-light mb-6 leading-tight">Capturing moments<br>that last forever</h1>
+            <p class="text-lg md:text-xl mb-10 max-w-2xl mx-auto font-light">Award-winning photography that tells your unique story.</p>
+            <a href="#gallery" class="btn-primary inline-block hover:bg-opacity-90">Explore Gallery</a>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->    <section id="gallery" class="py-24 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="section-heading text-3xl md:text-5xl font-serif mb-6 text-center">Portfolio Gallery</h2>
+            <p class="text-gray-600 text-center mb-16 max-w-2xl mx-auto font-light">Explore my curated collection of photography across various genres.</p>
+            
+            <!-- Gallery Filter Navigation -->
+            <div class="flex justify-center mb-16 flex-wrap">
+                <button class="gallery-filter-btn active px-5 py-2 mx-3 my-1 text-sm uppercase tracking-wider border-b-2 border-accent font-medium text-dark" data-category="all">All Work</button>
+                <button class="gallery-filter-btn px-5 py-2 mx-3 my-1 text-sm uppercase tracking-wider border-b-2 border-transparent hover:border-accent-light transition-colors font-medium text-gray-600 hover:text-dark" data-category="nature">Nature</button>
+                <button class="gallery-filter-btn px-5 py-2 mx-3 my-1 text-sm uppercase tracking-wider border-b-2 border-transparent hover:border-accent-light transition-colors font-medium text-gray-600 hover:text-dark" data-category="portrait">Portrait</button>
+                <button class="gallery-filter-btn px-5 py-2 mx-3 my-1 text-sm uppercase tracking-wider border-b-2 border-transparent hover:border-accent-light transition-colors font-medium text-gray-600 hover:text-dark" data-category="architecture">Architecture</button>
+                <button class="gallery-filter-btn px-5 py-2 mx-3 my-1 text-sm uppercase tracking-wider border-b-2 border-transparent hover:border-accent-light transition-colors font-medium text-gray-600 hover:text-dark" data-category="travel">Travel</button>
+            </div>
+            
+            <!-- Gallery Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">                <!-- Nature Images -->
+                <div class="gallery-item category-nature cursor-pointer overflow-hidden rounded-lg shadow-md">
+                    <img data-src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&auto=format&fit=crop&q=80" class="lazy-image w-full h-64 object-cover" alt="Mountain vista with fog">
+                    <div class="p-4 bg-white">
+                        <h3 class="font-semibold text-lg">Mountain Vista</h3>
+                        <p class="text-gray-600">Nature</p>
+                    </div>
+                </div>
+                <div class="gallery-item category-nature cursor-pointer overflow-hidden rounded-lg shadow-md">
+                    <img data-src="https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=800&h=600&auto=format&fit=crop&q=80" class="lazy-image w-full h-64 object-cover" alt="Waterfall in forest">
+                    <div class="p-4 bg-white">
+                        <h3 class="font-semibold text-lg">Cascading Falls</h3>
+                        <p class="text-gray-600">Nature</p>
+                    </div>
+                </div>
+                
+                <!-- Portrait Images -->
+                <div class="gallery-item category-portrait cursor-pointer overflow-hidden rounded-lg shadow-md">
+                    <img data-src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=800&h=600&auto=format&fit=crop&q=80" class="lazy-image w-full h-64 object-cover" alt="Woman portrait in city">
+                    <div class="p-4 bg-white">
+                        <h3 class="font-semibold text-lg">Urban Fashion</h3>
+                        <p class="text-gray-600">Portrait</p>
+                    </div>
+                </div>
+                <div class="gallery-item category-portrait cursor-pointer overflow-hidden rounded-lg shadow-md">
+                    <img data-src="https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?w=800&h=600&auto=format&fit=crop&q=80" class="lazy-image w-full h-64 object-cover" alt="Man portrait with studio lighting">
+                    <div class="p-4 bg-white">
+                        <h3 class="font-semibold text-lg">Studio Light</h3>
+                        <p class="text-gray-600">Portrait</p>
+                    </div>
+                </div>
+                
+                <!-- Architecture Images -->
+                <div class="gallery-item category-architecture cursor-pointer overflow-hidden rounded-lg shadow-md">
+                    <img data-src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&h=600&auto=format&fit=crop&q=80" class="lazy-image w-full h-64 object-cover" alt="Modern glass building">
+                    <div class="p-4 bg-white">
+                        <h3 class="font-semibold text-lg">Glass & Steel</h3>
+                        <p class="text-gray-600">Architecture</p>
+                    </div>
+                </div>
+                <div class="gallery-item category-architecture cursor-pointer overflow-hidden rounded-lg shadow-md">
+                    <img data-src="https://images.unsplash.com/photo-1518709766631-a6a7f45921c3?w=800&h=600&auto=format&fit=crop&q=80" class="lazy-image w-full h-64 object-cover" alt="Gothic cathedral">
+                    <div class="p-4 bg-white">
+                        <h3 class="font-semibold text-lg">Gothic Revival</h3>
+                        <p class="text-gray-600">Architecture</p>
+                    </div>
+                </div>
+                
+                <!-- Travel Images -->
+                <div class="gallery-item category-travel cursor-pointer overflow-hidden rounded-lg shadow-md">
+                    <img data-src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&h=600&auto=format&fit=crop&q=80" class="lazy-image w-full h-64 object-cover" alt="Tropical beach">
+                    <div class="p-4 bg-white">
+                        <h3 class="font-semibold text-lg">Coastal Journey</h3>
+                        <p class="text-gray-600">Travel</p>
+                    </div>
+                </div>
+                <div class="gallery-item category-travel cursor-pointer overflow-hidden rounded-lg shadow-md">
+                    <img data-src="https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=800&h=600&auto=format&fit=crop&q=80" class="lazy-image w-full h-64 object-cover" alt="Colorful market stalls">
+                    <div class="p-4 bg-white">
+                        <h3 class="font-semibold text-lg">Market Colors</h3>
+                        <p class="text-gray-600">Travel</p>
+                    </div>
+                </div>
+                
+                <!-- More Nature Images -->
+                <div class="gallery-item category-nature cursor-pointer overflow-hidden rounded-lg shadow-md">
+                    <img data-src="https://images.unsplash.com/photo-1473580044384-7ba9967e16a0?w=800&h=600&auto=format&fit=crop&q=80" class="lazy-image w-full h-64 object-cover" alt="Desert landscape at dawn">
+                    <div class="p-4 bg-white">
+                        <h3 class="font-semibold text-lg">Desert Dawn</h3>
+                        <p class="text-gray-600">Nature</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->    <section id="about" class="py-24 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center gap-16">
+                <div class="md:w-1/2">
+                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&h=600&auto=format&fit=crop&q=80" alt="Photographer portrait" class="rounded-lg shadow-lg w-full max-w-md mx-auto">
+                </div>
+                <div class="md:w-1/2">
+                    <span class="text-accent uppercase tracking-widest text-sm font-medium">The Artist</span>
+                    <h2 class="text-3xl md:text-5xl font-serif mt-2 mb-8">About Me</h2>
+                    <p class="text-gray-700 mb-6 leading-relaxed">I'm Emma Wilson, a professional photographer with over 10 years of experience capturing the beauty of our world. My work spans various genres including landscape, portrait, architectural, and travel photography.</p>
+                    <p class="text-gray-700 mb-6 leading-relaxed">I believe that photography is not just about taking pictures but about telling stories and preserving emotions. Every click of my camera is an attempt to freeze a moment in time that might otherwise be forgotten.</p>
+                    <p class="text-gray-700 mb-8 leading-relaxed">My work has been featured in National Geographic, Vogue, and various international exhibitions. I'm based in San Francisco but available for projects worldwide.</p>
+                    <div class="flex space-x-5">
+                        <a href="#" class="text-accent hover:text-accent-light transition-colors">
+                            <i class="fab fa-instagram text-2xl"></i>
+                        </a>
+                        <a href="#" class="text-accent hover:text-accent-light transition-colors">
+                            <i class="fab fa-facebook text-2xl"></i>
+                        </a>
+                        <a href="#" class="text-accent hover:text-accent-light transition-colors">
+                            <i class="fab fa-twitter text-2xl"></i>
+                        </a>
+                        <a href="#" class="text-accent hover:text-accent-light transition-colors">
+                            <i class="fab fa-pinterest text-2xl"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->    <section id="contact" class="py-24 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="section-heading text-3xl md:text-5xl font-serif mb-6 text-center">Get In Touch</h2>
+            <p class="text-gray-600 text-center mb-16 max-w-2xl mx-auto font-light leading-relaxed">Interested in working together? Fill out the form below and I'll get back to you soon.</p>
+            
+            <div class="max-w-4xl mx-auto">
+                <div class="flex flex-col md:flex-row gap-14">
+                    <div class="md:w-1/3">
+                        <div class="mb-10">
+                            <span class="text-accent uppercase tracking-widest text-sm font-medium">Contact Details</span>
+                            <h3 class="text-2xl font-serif mt-2 mb-4">Contact Information</h3>
+                            <p class="text-gray-600 font-light leading-relaxed">Feel free to reach out through any of these channels.</p>
+                        </div>
+                        <div class="space-y-8">
+                            <div class="flex items-start">
+                                <div class="bg-gray-100 p-3 rounded-full mr-4 text-accent">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-lg font-serif">Email</h4>
+                                    <p class="text-gray-600 font-light">hello@emmawilson.com</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="bg-gray-100 p-3 rounded-full mr-4 text-accent">
+                                    <i class="fas fa-phone"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-lg font-serif">Phone</h4>
+                                    <p class="text-gray-600 font-light">+1 (555) 123-4567</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="bg-gray-100 p-3 rounded-full mr-4 text-accent">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-lg font-serif">Location</h4>
+                                    <p class="text-gray-600 font-light">San Francisco, CA</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>                    <div class="md:w-2/3">
+                        <form id="contact-form" class="space-y-7">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-7">
+                                <div>
+                                    <label for="name" class="block text-gray-700 mb-2 font-medium text-sm uppercase tracking-wider">Name</label>
+                                    <input type="text" id="name" name="name" class="w-full px-4 py-3 border-b-2 border-gray-200 focus:border-accent bg-gray-50 focus:bg-white focus:outline-none transition-all" required>
+                                </div>
+                                <div>
+                                    <label for="email" class="block text-gray-700 mb-2 font-medium text-sm uppercase tracking-wider">Email</label>
+                                    <input type="email" id="email" name="email" class="w-full px-4 py-3 border-b-2 border-gray-200 focus:border-accent bg-gray-50 focus:bg-white focus:outline-none transition-all" required>
+                                </div>
+                            </div>
+                            <div>
+                                <label for="subject" class="block text-gray-700 mb-2 font-medium text-sm uppercase tracking-wider">Subject</label>
+                                <input type="text" id="subject" name="subject" class="w-full px-4 py-3 border-b-2 border-gray-200 focus:border-accent bg-gray-50 focus:bg-white focus:outline-none transition-all" required>
+                            </div>
+                            <div>
+                                <label for="message" class="block text-gray-700 mb-2 font-medium text-sm uppercase tracking-wider">Message</label>
+                                <textarea id="message" name="message" rows="5" class="w-full px-4 py-3 border-b-2 border-gray-200 focus:border-accent bg-gray-50 focus:bg-white focus:outline-none transition-all" required></textarea>
+                            </div>                            <div class="pt-4">
+                                <button type="submit" id="submit-button" class="btn-primary inline-block hover:bg-opacity-90 relative">
+                                    <span id="button-text">Send Message</span>
+                                    <span id="button-loader" class="hidden absolute inset-0 flex items-center justify-center">
+                                        <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                    </span>
+                                </button>
+                            </div>
+                            <div id="form-status" class="hidden mt-4"></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>    <!-- Footer -->
+    <footer class="bg-dark text-white py-16">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-8 md:mb-0">
+                    <a href="#" class="text-2xl font-serif">Emma Wilson <span class="text-accent">Photography</span></a>
+                    <p class="mt-3 text-gray-400 font-light">Capturing moments, creating memories.</p>
+                </div>
+                <div class="flex space-x-7">
+                    <a href="#" class="text-accent hover:text-accent-light transition-colors">
+                        <i class="fab fa-instagram text-xl"></i>
+                    </a>
+                    <a href="#" class="text-accent hover:text-accent-light transition-colors">
+                        <i class="fab fa-facebook text-xl"></i>
+                    </a>
+                    <a href="#" class="text-accent hover:text-accent-light transition-colors">
+                        <i class="fab fa-twitter text-xl"></i>
+                    </a>
+                    <a href="#" class="text-accent hover:text-accent-light transition-colors">
+                        <i class="fab fa-pinterest text-xl"></i>
+                    </a>
+                </div>
+            </div>
+            <hr class="border-gray-800 my-10">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 font-light">© 2025 Emma Wilson Photography. All rights reserved.</p>
+                <div class="mt-6 md:mt-0 space-x-8">
+                    <a href="#" class="text-gray-400 hover:text-accent transition-colors text-sm uppercase tracking-wider">Privacy Policy</a>
+                    <a href="#" class="text-gray-400 hover:text-accent transition-colors text-sm uppercase tracking-wider">Terms of Service</a>
+                    <a href="https://unsplash.com" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-accent transition-colors text-sm uppercase tracking-wider">Photos from Unsplash</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Fullscreen Slider -->
+    <div id="fullscreen-slider" class="fullscreen-slider fixed inset-0 hidden flex items-center justify-center">
+        <button id="close-slider" class="absolute top-6 right-6 text-white text-3xl z-50 hover:text-gray-300 transition-colors">
+            <i class="fas fa-times"></i>
+        </button>
+        <button id="prev-slide" class="absolute left-6 text-white text-5xl z-50 hover:text-gray-300 transition-colors">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <button id="next-slide" class="absolute right-6 text-white text-5xl z-50 hover:text-gray-300 transition-colors">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+        <div id="slider-content" class="w-full h-full flex items-center justify-center">
+            <!-- Slides will be added here dynamically -->
+        </div>
+        <div id="slide-counter" class="absolute bottom-6 text-white text-sm"></div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        mobileMenuButton.addEventListener('click', () => {
+            const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true';
+            mobileMenu.classList.toggle('hidden');
+            mobileMenuButton.setAttribute('aria-expanded', !isExpanded);
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+                
+                // Close mobile menu if open
+                if (!mobileMenu.classList.contains('hidden')) {
+                    mobileMenu.classList.add('hidden');
+                }
+            });
+        });
+
+        // Lazy loading implementation
+        document.addEventListener("DOMContentLoaded", function() {
+            let lazyImages = [].slice.call(document.querySelectorAll(".lazy-image"));
+            
+            // Add placeholder animation to each image container
+            lazyImages.forEach(function(lazyImage) {
+                lazyImage.classList.add('image-placeholder');
+            });
+            
+            if ("IntersectionObserver" in window) {
+                let lazyImageObserver = new IntersectionObserver(function(entries, observer) {
+                    entries.forEach(function(entry) {
+                        if (entry.isIntersecting) {
+                            let lazyImage = entry.target;
+                            lazyImage.onload = function() {
+                                lazyImage.classList.remove('image-placeholder');
+                                lazyImage.classList.add('lazy-image-loaded');
+                            };
+                            lazyImage.src = lazyImage.dataset.src;
+                            lazyImageObserver.unobserve(lazyImage);
+                        }
+                    });
+                });
+                
+                lazyImages.forEach(function(lazyImage) {
+                    lazyImageObserver.observe(lazyImage);
+                });
+            } else {
+                // Fallback for browsers that don't support IntersectionObserver
+                let active = false;
+                
+                const lazyLoad = function() {
+                    if (active === false) {
+                        active = true;
+                        
+                        setTimeout(function() {
+                            lazyImages.forEach(function(lazyImage) {
+                                if ((lazyImage.getBoundingClientRect().top <= window.innerHeight && lazyImage.getBoundingClientRect().bottom >= 0) && getComputedStyle(lazyImage).display !== "none") {
+                                    lazyImage.onload = function() {
+                                        lazyImage.classList.remove('image-placeholder');
+                                        lazyImage.classList.add('lazy-image-loaded');
+                                    };
+                                    lazyImage.src = lazyImage.dataset.src;
+                                    
+                                    lazyImages = lazyImages.filter(function(image) {
+                                        return image !== lazyImage;
+                                    });
+                                    
+                                    if (lazyImages.length === 0) {
+                                        document.removeEventListener("scroll", lazyLoad);
+                                        window.removeEventListener("resize", lazyLoad);
+                                        window.removeEventListener("orientationchange", lazyLoad);
+                                    }
+                                }
+                            });
+                            
+                            active = false;
+                        }, 200);
+                    }
+                };
+                
+                document.addEventListener("scroll", lazyLoad);
+                window.addEventListener("resize", lazyLoad);
+                window.addEventListener("orientationchange", lazyLoad);
+                lazyLoad();
+            }
+        });
+
+        // Gallery filtering
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterButtons = document.querySelectorAll('.gallery-filter-btn');
+            const galleryItems = document.querySelectorAll('.gallery-item');
+              filterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // Remove active class from all buttons
+                    filterButtons.forEach(btn => {
+                        btn.classList.remove('active', 'border-accent', 'text-dark');
+                        btn.classList.add('border-transparent', 'text-gray-600');
+                    });
+                    
+                    // Add active class to clicked button
+                    button.classList.add('active', 'border-accent', 'text-dark');
+                    button.classList.remove('border-transparent', 'text-gray-600');
+                    
+                    const category = button.getAttribute('data-category');
+                    
+                    // Filter gallery items
+                    galleryItems.forEach(item => {
+                        if (category === 'all' || item.classList.contains(`category-${category}`)) {
+                            item.style.display = 'block';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                });
+            });
+        });
+
+        // Fullscreen slider functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const fullscreenSlider = document.getElementById('fullscreen-slider');
+            const sliderContent = document.getElementById('slider-content');
+            const closeSlider = document.getElementById('close-slider');
+            const prevSlide = document.getElementById('prev-slide');
+            const nextSlide = document.getElementById('next-slide');
+            const slideCounter = document.getElementById('slide-counter');
+            const galleryItems = document.querySelectorAll('.gallery-item');
+            
+            let currentSlideIndex = 0;
+            let slides = [];
+              // Populate slides array with gallery images
+            galleryItems.forEach(item => {
+                const image = item.querySelector('img');
+                const title = item.querySelector('h3').textContent;
+                const category = item.querySelector('p').textContent;
+                
+                // Get the image source and convert to high-resolution for the slider
+                let imageSrc = image.dataset.src || image.src;
+                // Replace Unsplash image parameters for higher resolution in fullscreen
+                if (imageSrc.includes('unsplash.com')) {
+                    imageSrc = imageSrc.replace(/w=\d+&h=\d+&/, 'w=1600&h=1200&');
+                }
+                
+                slides.push({
+                    src: imageSrc,
+                    title: title,
+                    category: category
+                });
+            });
+            
+            // Open slider when clicking on a gallery item
+            galleryItems.forEach((item, index) => {
+                item.addEventListener('click', () => {
+                    openSlider(index);
+                });
+            });
+            
+            // Close slider
+            closeSlider.addEventListener('click', () => {
+                fullscreenSlider.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            });
+            
+            // Navigate to previous slide
+            prevSlide.addEventListener('click', () => {
+                navigateSlider(-1);
+            });
+            
+            // Navigate to next slide
+            nextSlide.addEventListener('click', () => {
+                navigateSlider(1);
+            });
+            
+            // Handle keyboard navigation
+            document.addEventListener('keydown', (e) => {
+                if (!fullscreenSlider.classList.contains('hidden')) {
+                    if (e.key === 'Escape') {
+                        fullscreenSlider.classList.add('hidden');
+                        document.body.style.overflow = 'auto';
+                    } else if (e.key === 'ArrowLeft') {
+                        navigateSlider(-1);
+                    } else if (e.key === 'ArrowRight') {
+                        navigateSlider(1);
+                    }
+                }
+            });
+            
+            // Open slider with specific slide
+            function openSlider(index) {
+                currentSlideIndex = index;
+                updateSlider();
+                fullscreenSlider.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+            
+            // Navigate through slides
+            function navigateSlider(direction) {
+                currentSlideIndex = (currentSlideIndex + direction + slides.length) % slides.length;
+                updateSlider();
+            }
+            
+            // Update slider content
+            function updateSlider() {
+                const slide = slides[currentSlideIndex];
+                
+                sliderContent.innerHTML = `
+                    <div class="text-center">
+                        <img src="${slide.src}" alt="${slide.title}" class="max-h-screen max-w-full object-contain">
+                        <div class="mt-4 text-white">
+                            <h3 class="text-2xl font-semibold">${slide.title}</h3>
+                            <p class="text-gray-300">${slide.category}</p>
+                        </div>
+                    </div>
+                `;
+                
+                slideCounter.textContent = `${currentSlideIndex + 1} / ${slides.length}`;
+            }
+        });        // Contact form handling
+        document.addEventListener('DOMContentLoaded', function() {
+            const contactForm = document.getElementById('contact-form');
+            const formStatus = document.getElementById('form-status');
+            const submitButton = document.getElementById('submit-button');
+            const buttonText = document.getElementById('button-text');
+            const buttonLoader = document.getElementById('button-loader');
+            
+            // Real-time form validation
+            const inputs = contactForm.querySelectorAll('input, textarea');
+            
+            inputs.forEach(input => {
+                input.addEventListener('blur', function() {
+                    validateInput(this);
+                });
+                
+                input.addEventListener('input', function() {
+                    if (this.classList.contains('is-invalid')) {
+                        validateInput(this);
+                    }
+                });
+            });
+            
+            function validateInput(input) {
+                const errorElement = input.nextElementSibling;
+                
+                if (!input.checkValidity()) {
+                    // Create error message if it doesn't exist
+                    if (!errorElement || !errorElement.classList.contains('error-message')) {
+                        const error = document.createElement('p');
+                        error.classList.add('error-message', 'text-red-500', 'text-sm', 'mt-1');
+                        
+                        if (input.validity.valueMissing) {
+                            error.textContent = `${input.name.charAt(0).toUpperCase() + input.name.slice(1)} is required.`;
+                        } else if (input.validity.typeMismatch && input.type === 'email') {
+                            error.textContent = 'Please enter a valid email address.';
+                        } else {
+                            error.textContent = 'Please enter a valid value.';
+                        }
+                        
+                        input.parentNode.insertBefore(error, input.nextSibling);
+                        input.classList.add('is-invalid', 'border-red-500');
+                    }
+                } else {
+                    // Remove error message if input is valid
+                    if (errorElement && errorElement.classList.contains('error-message')) {
+                        errorElement.remove();
+                        input.classList.remove('is-invalid', 'border-red-500');
+                        input.classList.add('border-green-500');
+                    }
+                }
+            }
+            
+            // Function to set button state
+            function setButtonState(isLoading) {
+                if (isLoading) {
+                    submitButton.disabled = true;
+                    submitButton.classList.add('opacity-90', 'cursor-not-allowed');
+                    buttonText.classList.add('invisible');
+                    buttonLoader.classList.remove('hidden');
+                } else {
+                    submitButton.disabled = false;
+                    submitButton.classList.remove('opacity-90', 'cursor-not-allowed');
+                    buttonText.classList.remove('invisible');
+                    buttonLoader.classList.add('hidden');
+                }
+            }
+            
+            contactForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Validate all inputs
+                let isValid = true;
+                inputs.forEach(input => {
+                    validateInput(input);
+                    if (!input.checkValidity()) {
+                        isValid = false;
+                    }
+                });
+                
+                if (!isValid) {
+                    return;
+                }
+                
+                // Show loading state on button
+                setButtonState(true);
+                
+                // Get form data
+                const formData = new FormData(contactForm);
+                const formDataObj = {};
+                formData.forEach((value, key) => {
+                    formDataObj[key] = value;
+                });
+                
+                // Here you would typically send the data to a server
+                // For demonstration, we'll log it and show a success message
+                console.log('Form data:', formDataObj);
+                
+                // Simulate API call delay
+                setTimeout(() => {
+                    // Show success message
+                    formStatus.innerHTML = `
+                        <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 transition-opacity animate-fadeIn">
+                            <p class="flex items-center">
+                                <svg class="h-5 w-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                </svg>
+                                Thank you for your message! We'll get back to you soon.
+                            </p>
+                        </div>
+                    `;
+                    formStatus.classList.remove('hidden');
+                    
+                    // Reset form and input styles
+                    contactForm.reset();
+                    inputs.forEach(input => {
+                        if (input.nextElementSibling && input.nextElementSibling.classList.contains('error-message')) {
+                            input.nextElementSibling.remove();
+                        }
+                        input.classList.remove('is-invalid', 'border-red-500', 'border-green-500');
+                    });
+                    
+                    // Reset button state
+                    setButtonState(false);
+                    
+                    // Hide success message after 5 seconds
+                    setTimeout(() => {
+                        const statusMessage = formStatus.querySelector('div');
+                        statusMessage.classList.add('opacity-0');
+                        setTimeout(() => {
+                            formStatus.classList.add('hidden');
+                            statusMessage.classList.remove('opacity-0');
+                        }, 500);
+                    }, 5000);
+                }, 1500);
+            });
+        });        // Add active class to nav links on scroll
+        document.addEventListener('DOMContentLoaded', function() {
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('nav a[href^="#"]');
+            
+            window.addEventListener('scroll', () => {
+                let current = '';
+                
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop - 100;
+                    const sectionHeight = section.clientHeight;
+                    
+                    if (pageYOffset >= sectionTop && pageYOffset < sectionTop + sectionHeight) {
+                        current = section.getAttribute('id');
+                    }
+                });
+                
+                navLinks.forEach(link => {
+                    link.classList.remove('active', 'text-accent');
+                    
+                    if (link.getAttribute('href') === `#${current}`) {
+                        link.classList.add('active', 'text-accent');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
