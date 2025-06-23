@@ -1,0 +1,2409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twitter Clone</title>
+    <style>
+        :root {
+            --twitter-blue: #1D9BF0;
+            --twitter-blue-hover: #1A8CD8;
+            --twitter-black: #0F1419;
+            --twitter-dark-gray: #536471;
+            --twitter-light-gray: #AAB8C2;
+            --twitter-extra-light-gray: #EFF3F4;
+            --twitter-white: #FFFFFF;
+            --nav-height: 3.5rem;
+            --font-size-base: 16px;
+            --user-icon-bg: #DFE9F2;
+            --twitter-red: #F4212E;
+            --twitter-green: #00BA7C;
+            
+            --bg-color: var(--twitter-white);
+            --text-color: var(--twitter-black);
+            --border-color: var(--twitter-extra-light-gray);
+            --secondary-bg: var(--twitter-extra-light-gray);
+            --card-bg: var(--twitter-white);
+            --hover-bg: rgba(0, 0, 0, 0.03);
+            --input-bg: var(--twitter-extra-light-gray);
+            --overlay-bg: rgba(0, 0, 0, 0.4);
+        }
+        
+        [data-theme="dark"] {
+            --bg-color: #000000;
+            --text-color: #E7E9EA;
+            --border-color: #2F3336;
+            --secondary-bg: #16181C;
+            --card-bg: #16181C;
+            --hover-bg: rgba(255, 255, 255, 0.03);
+            --input-bg: #202327;
+            --user-icon-bg: #3d5466;
+            --overlay-bg: rgba(91, 112, 131, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-size: var(--font-size-base);
+            line-height: 1.5;
+            overflow-x: hidden;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: var(--nav-height);
+            background-color: var(--bg-color);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 100;
+            transition: background-color 0.2s ease;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--twitter-dark-gray);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            padding: 0.5rem 0;
+            position: relative;
+            border-radius: 9999px;
+            width: 48px;
+            height: 48px;
+            justify-content: center;
+        }
+        
+        .nav-item:hover {
+            color: var(--twitter-blue);
+            background-color: var(--hover-bg);
+        }
+        
+        .nav-item.active {
+            color: var(--twitter-blue);
+            font-weight: 600;
+        }
+        
+        .nav-item i {
+            font-size: 1.3rem;
+            margin-bottom: 0.25rem;
+        }
+          .nav-item span {
+            font-size: 0.7rem;
+            margin-top: 2px;
+        }
+        
+        .compose-image-preview {
+            margin-top: 10px;
+            position: relative;
+            display: none;
+            border-radius: 16px;
+            overflow: hidden;
+            max-height: 250px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .compose-image-preview img {
+            width: 100%;
+            max-height: 250px;
+            object-fit: contain;
+        }
+        
+        .compose-image-preview .remove-image {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .image-upload {
+            display: none;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--nav-height);
+            background-color: var(--bg-color);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
+            z-index: 100;
+            transition: background-color 0.2s ease;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .profile-pic {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-right: 1rem;
+            flex-shrink: 0;
+            transition: transform 0.2s ease;
+        }
+        
+        .profile-pic:hover {
+            transform: scale(1.05);
+        }
+
+        .profile-pic img, .profile-pic svg {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .logo {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--twitter-blue);
+            font-size: 1.5rem;
+        }
+        
+        .theme-toggle {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background-color 0.2s ease;
+        }
+        
+        .theme-toggle:hover {
+            background-color: var(--hover-bg);
+        }
+
+        main {
+            margin-top: var(--nav-height);
+            margin-bottom: var(--nav-height);
+            padding: 0;
+            overflow-y: auto;
+            height: calc(100vh - 2 * var(--nav-height));
+        }
+
+        .compose-tweet {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: flex-start;
+            transition: background-color 0.2s ease;
+        }
+
+        .compose-tweet .profile-pic {
+            flex-shrink: 0;
+        }
+
+        .compose-input {
+            flex: 1;
+            margin-left: 0.75rem;
+        }
+
+        .compose-input textarea {
+            width: 100%;
+            border: none;
+            resize: none;
+            font-size: 1.25rem;
+            outline: none;
+            min-height: 3rem;
+            background: transparent;
+            margin-bottom: 0.75rem;
+            color: var(--text-color);
+            transition: all 0.2s ease;
+        }
+        
+        .compose-input textarea::placeholder {
+            color: var(--twitter-dark-gray);
+            opacity: 0.8;
+        }
+
+        .compose-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.5rem;
+        }
+
+        .compose-tools {
+            display: flex;
+            gap: 1rem;
+            color: var(--twitter-blue);
+        }
+        
+        .compose-tools i {
+            cursor: pointer;
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.2s ease;
+        }
+        
+        .compose-tools i:hover {
+            background-color: rgba(29, 155, 240, 0.1);
+        }
+
+        .tweet-button {
+            background-color: var(--twitter-blue);
+            color: white;
+            border: none;
+            border-radius: 9999px;
+            padding: 0.6rem 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .tweet-button:hover {
+            background-color: var(--twitter-blue-hover);
+        }
+
+        .tweet-button.active {
+            opacity: 1;
+        }
+
+        .tweet-feed {
+            overflow-y: auto;
+        }
+
+        .tweet {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            animation: fadeIn 0.3s ease;
+            transition: background-color 0.2s ease;
+            position: relative;
+        }
+        
+        .tweet:hover {
+            background-color: var(--hover-bg);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tweet-main-content {
+            display: flex;
+            width: 100%;
+        }
+
+        .tweet-content {
+            flex: 1;
+            margin-left: 0.75rem;
+            width: 80%;
+        }
+
+        .tweet-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.25rem;
+        }
+
+        .tweet-name {
+            font-weight: 700;
+            margin-right: 0.25rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .tweet-name:hover {
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .tweet-username, .tweet-time {
+            color: var(--twitter-dark-gray);
+            font-size: 0.875rem;
+            white-space: nowrap;
+        }
+
+        .tweet-username {
+            margin-right: 0.25rem;
+        }
+        
+        .tweet-more {
+            margin-left: auto;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            cursor: pointer;
+            color: var(--twitter-dark-gray);
+            opacity: 0;
+            transition: all 0.2s ease;
+        }
+        
+        .tweet:hover .tweet-more {
+            opacity: 1;
+        }
+        
+        .tweet-more:hover {
+            background-color: rgba(29, 155, 240, 0.1);
+            color: var(--twitter-blue);
+        }
+
+        .tweet-text {
+            margin-bottom: 0.75rem;
+            word-wrap: break-word;
+            font-size: 1rem;
+            line-height: 1.4;
+        }
+
+        .tweet-image {
+            margin: 0.75rem 0;
+            border-radius: 16px;
+            overflow: hidden;
+            max-width: 100%;
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .tweet-image img {
+            width: 100%;
+            height: auto;
+            max-height: 350px;
+            object-fit: cover;
+            display: block;
+            transition: opacity 0.2s ease;
+        }
+        
+        .tweet-image:hover img {
+            opacity: 0.95;
+        }
+
+        .tweet-actions {
+            display: flex;
+            justify-content: space-between;
+            max-width: 90%;
+            color: var(--twitter-dark-gray);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+
+        .tweet-action {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            padding: 0.4rem;
+            border-radius: 9999px;
+        }
+        
+        .tweet-action span {
+            font-size: 0.8rem;
+        }
+
+        .tweet-action i {
+            font-size: 1rem;
+            width: 1.2rem;
+            height: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tweet-action.reply:hover {
+            color: var(--twitter-blue);
+            background-color: rgba(29, 155, 240, 0.1);
+        }
+
+        .tweet-action.retweet:hover, .tweet-action.retweet.active {
+            color: var(--twitter-green);
+            background-color: rgba(0, 186, 124, 0.1);
+        }
+
+        .tweet-action.like:hover, .tweet-action.like.active {
+            color: var(--twitter-red);
+            background-color: rgba(249, 24, 128, 0.1);
+        }
+
+        .tweet-action.share:hover {
+            color: var(--twitter-blue);
+            background-color: rgba(29, 155, 240, 0.1);
+        }
+
+        .fab {
+            position: fixed;
+            bottom: calc(var(--nav-height) + 1rem);
+            right: 1rem;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background-color: var(--twitter-blue);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            z-index: 50;
+        }
+
+        .fab:hover {
+            background-color: var(--twitter-blue-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .fab:active {
+            transform: scale(0.95);
+        }
+
+        .fab i {
+            font-size: 1.5rem;
+        }
+
+        .retweeted-by {
+            color: var(--twitter-dark-gray);
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .retweeted-by i {
+            margin-right: 0.5rem;
+            color: var(--twitter-green);
+        }
+        
+        .retweet-dialog {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--bg-color);
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+            z-index: 150;
+            box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+            border-bottom: none;
+        }
+        
+        .retweet-dialog.visible {
+            transform: translateY(0);
+        }
+        
+        .retweet-dialog-options {
+            padding: 1rem 0;
+        }
+        
+        .retweet-dialog-option {
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        
+        .retweet-dialog-option:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        .retweet-dialog-option i {
+            margin-right: 1rem;
+            font-size: 1.2rem;
+            width: 1.5rem;
+            text-align: center;
+        }
+
+        .notification {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: flex-start;
+            transition: background-color 0.2s ease;
+        }
+        
+        .notification:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        .notification-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+        
+        .notification-icon.like {
+            color: white;
+            background-color: var(--twitter-red);
+        }
+        
+        .notification-icon.retweet {
+            color: white;
+            background-color: var(--twitter-green);
+        }
+        
+        .notification-icon.mention {
+            color: white;
+            background-color: var(--twitter-blue);
+        }
+        
+        .notification-icon.follow {
+            color: white;
+            background-color: var(--twitter-blue);
+        }
+        
+        .notification-content {
+            flex: 1;
+        }
+        
+        .notification-users {
+            display: flex;
+            margin-bottom: 0.5rem;
+        }
+        
+        .notification-user-pics {
+            display: flex;
+            margin-right: 0.5rem;
+        }
+        
+        .notification-user-pic {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            border: 2px solid var(--bg-color);
+            overflow: hidden;
+            margin-left: -0.8rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .notification-user-pic:first-child {
+            margin-left: 0;
+        }
+        
+        .notification-text {
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+        }
+        
+        .notification-text strong {
+            font-weight: 700;
+        }
+        
+        .notification-tweet {
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--twitter-dark-gray);
+            background-color: var(--card-bg);
+            transition: background-color 0.2s ease;
+            margin-top: 0.5rem;
+        }
+        
+        .notification-tweet:hover {
+            background-color: var(--hover-bg);
+        }        .messages-container {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .conversation-list {
+            flex: 1;
+            overflow-y: auto;
+            width: 100%;
+        }
+        
+        .conversation {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: flex-start;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        
+        .conversation:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        .conversation-avatar {
+            margin-right: 1rem;
+            flex-shrink: 0;
+            width: 3rem;
+            height: 3rem;
+        }
+        
+        .conversation-content {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .conversation-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.25rem;
+        }
+        
+        .conversation-name {
+            font-weight: 700;
+            margin-right: 0.5rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .conversation-username {
+            color: var(--twitter-dark-gray);
+            white-space: nowrap;
+        }
+        
+        .conversation-time {
+            color: var(--twitter-dark-gray);
+            font-size: 0.875rem;
+            white-space: nowrap;
+        }
+        
+        .conversation-last-message {
+            color: var(--twitter-dark-gray);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .message-thread {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-color);
+            z-index: 200;
+        }
+        
+        .message-thread.visible {
+            display: flex;
+        }
+        
+        .message-header {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+        }
+        
+        .message-header-back {
+            margin-right: 1.5rem;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.2s ease;
+        }
+        
+        .message-header-back:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        .message-header-info {
+            flex: 1;
+        }
+        
+        .message-header-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        
+        .message-header-username {
+            color: var(--twitter-dark-gray);
+            font-size: 0.875rem;
+        }
+        
+        .message-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg-color);
+        }
+        
+        .message {
+            max-width: 70%;
+            padding: 0.9rem 1rem;
+            border-radius: 18px;
+            margin-bottom: 1rem;
+            position: relative;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            line-height: 1.4;
+        }
+        
+        .message.incoming {
+            align-self: flex-start;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-bottom-left-radius: 4px;
+        }
+        
+        .message.outgoing {
+            align-self: flex-end;
+            background-color: var(--twitter-blue);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .message-time {
+            font-size: 0.75rem;
+            color: var(--twitter-dark-gray);
+            margin-top: 0.25rem;
+            text-align: right;
+        }
+        
+        .message.outgoing .message-time {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .message-input-container {
+            padding: 1rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            background-color: var(--bg-color);
+        }
+        
+        .message-input {
+            flex: 1;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 0.75rem 1rem;
+            resize: none;
+            max-height: 5rem;
+            outline: none;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            transition: all 0.2s ease;
+        }
+        
+        .message-input:focus {
+            border-color: var(--twitter-blue);
+        }
+        
+        .message-send {
+            margin-left: 0.75rem;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--twitter-blue);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .message-send:hover {
+            background-color: var(--twitter-blue-hover);
+            transform: scale(1.05);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 1.5rem;
+            color: var(--twitter-dark-gray);
+            margin: 1rem 0;
+            display: none;
+        }
+
+        .loading.visible {
+            display: block;
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+        
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--overlay-bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 200;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+
+        .modal.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            width: 90%;
+            max-width: 600px;
+            background-color: var(--bg-color);
+            border-radius: 16px;
+            overflow: hidden;
+            transform: scale(0.9) translateY(20px);
+            transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+        }
+
+        .modal.visible .modal-content {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background-color 0.2s ease;
+            color: var(--twitter-dark-gray);
+        }
+
+        .modal-close:hover {
+            background-color: var(--hover-bg);
+            color: var(--twitter-blue);
+        }
+
+        .modal-title {
+            flex: 1;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .tab-indicator {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 4px;
+            border-radius: 2px;
+            background-color: var(--twitter-blue);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        
+        .nav-item.active .tab-indicator {
+            opacity: 1;
+        }
+        
+        .badge {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background-color: var(--twitter-red);
+            color: white;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            border: 2px solid var(--bg-color);
+        }
+        
+        .verified-badge {
+            color: var(--twitter-blue);
+            margin-left: 2px;
+            font-size: 0.9rem;
+        }
+
+        .section-divider {
+            height: 10px;
+            background-color: var(--secondary-bg);
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--twitter-dark-gray);
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--twitter-blue);
+        }
+        
+        .empty-state h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+        
+        .empty-state p {
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 767px) {
+            .compose-tweet:not(.in-modal) {
+                display: none;
+            }
+        }
+
+        @media (max-width: 320px) {
+            :root {
+                --font-size-base: 14px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            :root {
+                --font-size-base: 16px;
+                --nav-height: 4rem;
+            }
+            
+            body {
+                display: flex;
+                overflow: hidden;
+            }
+            
+            nav {
+                position: fixed;
+                top: 0;
+                bottom: auto;
+                left: 0;
+                width: 80px;
+                height: 100vh;
+                flex-direction: column;
+                justify-content: flex-start;
+                padding-top: 1rem;
+                border-top: none;
+                border-right: 1px solid var(--border-color);
+                z-index: 150;
+            }
+            
+            .nav-item {
+                margin-bottom: 0.5rem;
+                width: 56px;
+                height: 56px;
+                justify-content: left;
+            }
+            
+            .tab-indicator {
+                left: auto;
+                right: 0;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 4px;
+                height: 4px;
+            }
+            
+            main {
+                margin-left: 80px;
+                margin-bottom: 0;
+                margin-top: var(--nav-height);
+                width: calc(100% - 80px);
+                height: calc(100vh - var(--nav-height));
+                overflow-y: auto;
+                overflow-x: hidden;
+            }
+            
+            header {
+                position: fixed;
+                width: calc(100% - 80px);
+                left: 80px;
+                z-index: 100;
+                background-color: var(--bg-color);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+            }
+            
+            .fab {
+                bottom: 2rem;
+                right: 2rem;
+            }
+            
+            .compose-tweet:not(.in-modal) {
+                display: flex;
+                max-width: 600px;
+                margin: 0 auto;
+                border-bottom: 1px solid var(--border-color);
+                border-left: 1px solid var(--border-color);
+                border-right: 1px solid var(--border-color);
+            }
+              .tweet-feed {
+                max-width: 600px;
+                margin: 0 auto;
+                border-left: 1px solid var(--border-color);
+                border-right: 1px solid var(--border-color);
+            }
+            
+            /* Style message thread for desktop view */
+            .messages-container {
+                max-width: 600px;
+                margin: 0 auto;
+                border-left: 1px solid var(--border-color);
+                border-right: 1px solid var(--border-color);
+                position: relative;
+                height: calc(100vh - var(--nav-height));
+            }
+            
+            .message-thread {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                max-width: 600px;
+                left: 0;
+                top: 0;
+            }
+            
+            .profile-pic {
+                width: 2.5rem;
+                height: 2.5rem;
+            }
+            
+            .tweet {
+                padding: 1rem;
+                border-bottom: 1px solid var(--border-color);
+                transition: background-color 0.2s ease;
+                position: relative;
+            }
+            
+            .logo {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+        }
+        
+        @media (min-width: 1200px) {
+            nav {
+                width: 275px;
+                align-items: flex-start;
+                padding-left: 1rem;
+            }
+            
+            .nav-item {
+                flex-direction: row;
+                width: auto;
+                height: auto;
+                padding: 0.8rem 1.5rem;
+                border-radius: 9999px;
+                margin-bottom: 0.5rem;
+                width: 90%;
+            }
+            
+            .nav-item i {
+                margin-bottom: 0;
+                margin-right: 1rem;
+            }
+            
+            .nav-item span {
+                display: block;
+                margin-top: 0;
+                font-size: 1rem;
+            }
+            
+            main {
+                margin-left: 275px;
+                width: calc(100% - 275px);
+            }
+            header {
+                margin-left: 275px;
+                width: calc(100% - 350px);
+            }
+            
+            .tab-indicator {
+                display: none;
+            }
+            
+            main::after {
+                content: "";
+                position: fixed;
+                top: 0;
+                right: 0;
+                width: 350px;
+                height: 100vh;
+                background-color: transparent;
+                z-index: -1;
+            }
+            
+            .tweet-feed,
+            .compose-tweet:not(.in-modal) {
+                margin: 0 auto;
+                max-width: 600px;
+            }
+
+            .badge {
+                right: 62px;
+            }
+        }
+
+        .compose-image-preview {
+            margin-top: 10px;
+            position: relative;
+            display: none;
+            border-radius: 16px;
+            overflow: hidden;
+            max-height: 250px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .compose-image-preview img {
+            width: 100%;
+            max-height: 250px;
+            object-fit: contain;
+        }
+        
+        .compose-image-preview .remove-image {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .image-upload {
+            display: none;
+        }
+    </style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <header style="flex: 1; justify-content: space-between;">
+        <div class="profile-pic">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="12" fill="var(--user-icon-bg)"/>
+                <circle cx="12" cy="9" r="3.5" fill="var(--twitter-dark-gray)"/>
+                <path d="M12 13.5C8.5 13.5 6 15.5 6 18.5V22H18V18.5C18 15.5 15.5 13.5 12 13.5Z" fill="var(--twitter-dark-gray)"/>
+            </svg>
+        </div>
+        <div class="theme-toggle" id="theme-toggle">
+            <i class="fas fa-sun"></i>
+        </div>
+    </header>    <main>
+        <div class="compose-tweet">
+            <div class="profile-pic">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="12" fill="var(--user-icon-bg)"/>
+                    <circle cx="12" cy="9" r="3.5" fill="var(--twitter-dark-gray)"/>
+                    <path d="M12 13.5C8.5 13.5 6 15.5 6 18.5V22H18V18.5C18 15.5 13.5 13.5 12 13.5Z" fill="var(--twitter-dark-gray)"/>
+                </svg>
+            </div>
+            <div class="compose-input">
+                <textarea placeholder="What's happening?"></textarea>                <div class="compose-image-preview">
+                    <img src="" alt="Selected image">
+                    <div class="remove-image"><i class="fas fa-times"></i></div>
+                </div>
+                <div class="compose-actions">
+                    <div class="compose-tools">
+                        <label for="image-upload">
+                            <i class="far fa-image"></i>
+                        </label>
+                        <input type="file" id="image-upload" class="image-upload" accept="image/*">
+                        <i class="fas fa-poll-h"></i>
+                        <i class="far fa-smile"></i>
+                        <i class="far fa-calendar-alt"></i>
+                    </div>
+                    <button class="tweet-button">Tweet</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tweet-feed" id="tweet-feed">
+            <!-- Tweet feed will be populated by JavaScript -->
+        </div>
+
+        <div class="loading" id="loading">
+            <i class="fas fa-spinner fa-spin"></i> Loading tweets...
+        </div>
+    </main>
+
+    <div class="fab" id="compose-fab" style="text-align: center;">
+        <i class="fas fa-feather-alt" style="line-height: 56px;"></i>
+    </div>
+
+    <nav>
+        <div class="nav-item active" data-tab="home">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+            <div class="tab-indicator"></div>
+        </div>
+        <div class="nav-item" data-tab="explore">
+            <i class="fas fa-search"></i>
+            <span>Explore</span>
+            <div class="tab-indicator"></div>
+        </div>
+        <div class="nav-item" data-tab="notifications">
+            <i class="far fa-bell"></i>
+            <span>Notifications</span>
+            <div class="badge">3</div>
+            <div class="tab-indicator"></div>
+        </div>
+        <div class="nav-item" data-tab="messages">
+            <i class="far fa-envelope"></i>
+            <span>Messages</span>
+            <div class="tab-indicator"></div>
+        </div>
+    </nav>
+
+    <div class="modal" id="compose-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-close" id="modal-close">&times;</div>
+                <div class="modal-title">Compose Tweet</div>
+            </div>
+            <div class="compose-tweet in-modal">
+                <div class="compose-input">
+                    <div class="profile-pic">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="12" fill="var(--user-icon-bg)"/>
+                        <circle cx="12" cy="9" r="3.5" fill="var(--twitter-dark-gray)"/>
+                        <path d="M12 13.5C8.5 13.5 6 15.5 6 18.5V22H18V18.5C18 15.5 13.5 13.5 12 13.5Z" fill="var(--twitter-dark-gray)"/>
+                    </svg>
+                </div>
+                    <textarea placeholder="What's happening?"></textarea>                    <div class="compose-image-preview">
+                        <img src="" alt="Selected image">
+                        <div class="remove-image"><i class="fas fa-times"></i></div>
+                    </div>
+                    <div class="compose-actions">
+                        <div class="compose-tools">
+                            <label for="modal-image-upload">
+                                <i class="far fa-image"></i>
+                            </label>
+                            <input type="file" id="modal-image-upload" class="image-upload" accept="image/*">
+                            <i class="fas fa-poll-h"></i>
+                            <i class="far fa-smile"></i>
+                            <i class="far fa-calendar-alt"></i>
+                        </div>
+                        <button class="tweet-button" id="modal-tweet-button">Tweet</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="retweet-dialog" id="retweet-dialog">
+        <div class="retweet-dialog-options">
+            <div class="retweet-dialog-option" id="retweet-option">
+                <i class="fas fa-retweet"></i>
+                <span>Retweet</span>
+            </div>
+            <div class="retweet-dialog-option" id="quote-retweet-option">
+                <i class="fas fa-pen"></i>
+                <span>Quote Tweet</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const tweetFeed = document.getElementById('tweet-feed');
+        const loadingIndicator = document.getElementById('loading');
+        const composeFab = document.getElementById('compose-fab');
+        const composeModal = document.getElementById('compose-modal');
+        const modalClose = document.getElementById('modal-close');
+        const navItems = document.querySelectorAll('.nav-item');
+        const tweetButtons = document.querySelectorAll('.tweet-button');
+        const tweetTextareas = document.querySelectorAll('textarea');
+        const retweetDialog = document.getElementById('retweet-dialog');
+        const retweetOption = document.getElementById('retweet-option');
+        const quoteRetweetOption = document.getElementById('quote-retweet-option');
+        const mainElement = document.querySelector('main');
+        const imageUploads = document.querySelectorAll('.image-upload');
+        const removeImageButtons = document.querySelectorAll('.remove-image');
+
+        let tweets = [];
+        let isLoading = false;
+        let page = 1;
+        let activeTab = 'home';
+        let currentRetweetTweetId = null;
+        let notificationsData = [];
+        let conversationsData = [];
+        let darkMode = true; 
+        let isMobile = window.innerWidth < 768;
+        let selectedImage = null;
+        let selectedImageModal = null;
+        
+        function updateComposeFabVisibility() {
+            const composeSection = document.querySelector('.compose-tweet:not(.in-modal)');
+            
+            if (activeTab === 'home') {
+                composeFab.style.display = 'block';
+                
+                if (!isMobile) {
+                    composeSection.style.display = 'flex';
+                } else {
+                    composeSection.style.display = 'none';
+                }
+            } else {
+                composeFab.style.display = 'none';
+                composeSection.style.display = 'none';
+            }
+        }
+        
+        function toggleDarkMode() {
+            darkMode = !darkMode;
+            const themeToggle = document.getElementById('theme-toggle');
+            
+            if (darkMode) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                localStorage.setItem('twitter-clone-theme', 'dark');
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+                localStorage.setItem('twitter-clone-theme', 'light');
+            }
+        }
+        
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('twitter-clone-theme');
+            if (savedTheme === 'dark') {
+                darkMode = true;
+                document.documentElement.setAttribute('data-theme', 'dark');
+                document.getElementById('theme-toggle').innerHTML = '<i class="fas fa-sun"></i>';
+            }
+        }
+        
+        function generateUserIcon() {
+            const colors = ['#FF8C00', '#E0245E', '#1DA1F2', '#794BC4', '#17BF63'];
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            
+            return `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="12" fill="${randomColor}"/>
+                <circle cx="12" cy="10" r="4" fill="#FFFFFF"/>
+                <path d="M12 14.5C8.5 14.5 6 16.5 6 19.5V22H18V19.5C18 16.5 15.5 14.5 12 14.5Z" fill="#FFFFFF"/>
+            </svg>`;
+        }
+
+        function getRandomDate() {
+            const now = new Date();
+            const hoursAgo = Math.floor(Math.random() * 24);
+            const minutesAgo = Math.floor(Math.random() * 60);
+            const date = new Date(now.getTime() - (hoursAgo * 60 * 60 * 1000) - (minutesAgo * 60 * 1000));
+            
+            if (hoursAgo === 0) {
+                return `${minutesAgo}m`;
+            } else {
+                return `${hoursAgo}h`;
+            }
+        }
+
+        const currentUser = {
+            name: 'Current User',
+            username: '@currentuser',
+            profilePic: generateUserIcon(),
+            verified: true
+        };
+        
+        const users = [
+            { name: 'John Doe', username: '@johndoe', profilePic: generateUserIcon(), verified: false },
+            { name: 'Jane Smith', username: '@janesmith', profilePic: generateUserIcon(), verified: true },
+            { name: 'Tech News', username: '@technews', profilePic: generateUserIcon(), verified: true },
+            { name: 'Sports Update', username: '@sportsupdate', profilePic: generateUserIcon(), verified: false },
+            { name: 'Travel Blogger', username: '@travelblogger', profilePic: generateUserIcon(), verified: true }
+        ];
+        
+        const tweetContents = [
+            'Just published a new article on web development best practices. Check it out!',
+            'Excited to announce our new product launch next week! Stay tuned for more details. #ProductLaunch',
+            'Had an amazing time at the conference today. Met so many talented people! #Networking',
+            'Beautiful sunset view from my balcony today. Nature at its best!',
+            'Working on a new project. Can\'t wait to share it with all of you soon! #StayTuned',
+            'Just finished reading an amazing book. Highly recommend it!',
+            'New personal best in my morning run today! #Fitness #Goals',
+            'Delicious homemade dinner tonight. Recipe coming soon!',
+            'Throwback to last year\'s vacation. Need to plan another trip soon! #Travel',
+            'Learning a new programming language this week. Any tips?'
+        ];
+        
+        const tweetImages = [
+            'https://images.pexels.com/photos/958545/pexels-photo-958545.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+            'https://images.pexels.com/photos/1181396/pexels-photo-1181396.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+            'https://images.pexels.com/photos/705792/pexels-photo-705792.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+            'https://images.pexels.com/photos/237272/pexels-photo-237272.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+            null,
+            null,
+            'https://images.pexels.com/photos/378570/pexels-photo-378570.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+            null,
+            'https://images.pexels.com/photos/853168/pexels-photo-853168.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+            null
+        ];
+
+        function generateNotifications() {
+            const notificationTypes = ['like', 'retweet', 'mention', 'follow'];
+            const notifications = [];
+            
+            for (let i = 0; i < 15; i++) {
+                const type = notificationTypes[Math.floor(Math.random() * notificationTypes.length)];
+                const userIndices = [];
+                const userCount = Math.floor(Math.random() * 3) + 1;
+                
+                for (let j = 0; j < userCount; j++) {
+                    let userIndex;
+                    do {
+                        userIndex = Math.floor(Math.random() * users.length);
+                    } while (userIndices.includes(userIndex));
+                    userIndices.push(userIndex);
+                }
+                
+                const notificationUsers = userIndices.map(index => users[index]);
+                
+                let notificationText = '';
+                let tweetContent = '';
+                
+                switch (type) {
+                    case 'like':
+                        notificationText = `liked your Tweet`;
+                        tweetContent = tweetContents[Math.floor(Math.random() * tweetContents.length)];
+                        break;
+                    case 'retweet':
+                        notificationText = `retweeted your Tweet`;
+                        tweetContent = tweetContents[Math.floor(Math.random() * tweetContents.length)];
+                        break;
+                    case 'mention':
+                        notificationText = `mentioned you in a Tweet`;
+                        tweetContent = `Hey ${currentUser.username}, ${tweetContents[Math.floor(Math.random() * tweetContents.length)]}`;
+                        break;
+                    case 'follow':
+                        notificationText = `followed you`;
+                        tweetContent = '';
+                        break;
+                }
+                
+                notifications.push({
+                    id: Date.now() + i,
+                    type,
+                    users: notificationUsers,
+                    text: notificationText,
+                    tweetContent,
+                    time: getRandomDate()
+                });
+            }
+            
+            return notifications;
+        }
+        
+        function renderNotifications() {
+            if (notificationsData.length === 0) {
+                notificationsData = generateNotifications();
+            }
+            
+            tweetFeed.innerHTML = '';
+            const fragment = document.createDocumentFragment();
+            
+            notificationsData.forEach(notification => {
+                const notificationElement = document.createElement('div');
+                notificationElement.className = 'notification';
+                
+                let iconClass = '';
+                switch (notification.type) {
+                    case 'like':
+                        iconClass = 'fas fa-heart';
+                        break;
+                    case 'retweet':
+                        iconClass = 'fas fa-retweet';
+                        break;
+                    case 'mention':
+                        iconClass = 'fas fa-at';
+                        break;
+                    case 'follow':
+                        iconClass = 'fas fa-user-plus';
+                        break;
+                }
+                
+                const userPics = notification.users.map(user => 
+                    `<div class="notification-user-pic">${user.profilePic}</div>`
+                ).join('');
+                
+                const userNames = notification.users.map(user => user.name).join(', ');
+                
+                const tweetHtml = notification.tweetContent 
+                    ? `<div class="notification-tweet">${notification.tweetContent}</div>` 
+                    : '';
+                
+                notificationElement.innerHTML = `
+                    <div class="notification-icon ${notification.type}">
+                        <i class="${iconClass}"></i>
+                    </div>
+                    <div class="notification-content">
+                        <div class="notification-users">
+                            <div class="notification-user-pics">
+                                ${userPics}
+                            </div>
+                        </div>
+                        <div class="notification-text">
+                            <strong>${userNames}</strong> ${notification.text}
+                        </div>
+                        ${tweetHtml}
+                    </div>
+                `;
+                
+                fragment.appendChild(notificationElement);
+            });
+            
+            tweetFeed.appendChild(fragment);
+            
+            document.querySelector('.nav-item[data-tab="notifications"] .badge').style.display = 'none';
+        }
+        
+        function generateConversations() {
+            const conversations = [];
+            
+            for (let i = 0; i < 10; i++) {
+                const userIndex = Math.floor(Math.random() * users.length);
+                const user = users[userIndex];
+                
+                const lastMessageIndex = Math.floor(Math.random() * tweetContents.length);
+                const lastMessage = tweetContents[lastMessageIndex];
+                
+                const hoursAgo = Math.floor(Math.random() * 24);
+                const minutesAgo = Math.floor(Math.random() * 60);
+                let timeString = '';
+                
+                if (hoursAgo === 0) {
+                    timeString = `${minutesAgo}m`;
+                } else {
+                    timeString = `${hoursAgo}h`;
+                }
+                
+                const messages = [];
+                const messageCount = Math.floor(Math.random() * 10) + 3;
+                
+                for (let j = 0; j < messageCount; j++) {
+                    const isOutgoing = Math.random() > 0.5;
+                    const messageText = tweetContents[Math.floor(Math.random() * tweetContents.length)];
+                    const messageTime = `${Math.floor(Math.random() * 12)}:${Math.floor(Math.random() * 60).toString().padStart(2, '0')} ${Math.random() > 0.5 ? 'AM' : 'PM'}`;
+                    
+                    messages.push({
+                        id: Date.now() + i + j,
+                        text: messageText,
+                        isOutgoing,
+                        time: messageTime
+                    });
+                }
+                
+                conversations.push({
+                    id: Date.now() + i,
+                    user,
+                    lastMessage,
+                    time: timeString,
+                    messages
+                });
+            }
+            
+            return conversations;
+        }
+        
+        function renderMessages() {
+            if (conversationsData.length === 0) {
+                conversationsData = generateConversations();
+            }
+            
+            tweetFeed.innerHTML = `
+                <div class="messages-container">
+                    <div class="conversation-list" id="conversation-list"></div>
+                    <div class="message-thread" id="message-thread">
+                        <div class="message-header">
+                            <div class="message-header-back">
+                                <i class="fas fa-arrow-left"></i>
+                            </div>
+                            <div class="message-header-info">
+                                <div class="message-header-name"></div>
+                                <div class="message-header-username"></div>
+                            </div>
+                        </div>
+                        <div class="message-body" id="message-body"></div>
+                        <div class="message-input-container">
+                            <textarea class="message-input" placeholder="Start a new message"></textarea>
+                            <div class="message-send">
+                                <i class="fas fa-paper-plane"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            const conversationList = document.getElementById('conversation-list');
+            const messageThread = document.getElementById('message-thread');
+            const messageBody = document.getElementById('message-body');
+            const messageHeaderName = document.querySelector('.message-header-name');
+            const messageHeaderUsername = document.querySelector('.message-header-username');
+            const messageHeaderBack = document.querySelector('.message-header-back');
+            const messageInput = document.querySelector('.message-input');
+            const messageSend = document.querySelector('.message-send');
+            
+            const fragment = document.createDocumentFragment();
+            
+            conversationsData.forEach(conversation => {
+                const conversationElement = document.createElement('div');
+                conversationElement.className = 'conversation';
+                conversationElement.dataset.id = conversation.id;
+                
+                conversationElement.innerHTML = `
+                    <div class="conversation-avatar">${conversation.user.profilePic}</div>
+                    <div class="conversation-content">
+                        <div class="conversation-header">
+                            <div>
+                                <span class="conversation-name">${conversation.user.name}</span>
+                                <span class="conversation-username">${conversation.user.username}</span>
+                            </div>
+                            <div class="conversation-time">${conversation.time}</div>
+                        </div>
+                        <div class="conversation-last-message">${conversation.lastMessage}</div>
+                    </div>
+                `;
+                
+                conversationElement.addEventListener('click', () => {
+                    messageThread.classList.add('visible');
+                    conversationList.style.display = 'none';
+                    
+                    messageHeaderName.textContent = conversation.user.name;
+                    messageHeaderUsername.textContent = conversation.user.username;
+                    
+                    messageBody.innerHTML = '';
+                    conversation.messages.forEach(message => {
+                        const messageElement = document.createElement('div');
+                        messageElement.className = `message ${message.isOutgoing ? 'outgoing' : 'incoming'}`;
+                        
+                        messageElement.innerHTML = `
+                            <div class="message-text">${message.text}</div>
+                            <div class="message-time">${message.time}</div>
+                        `;
+                        
+                        messageBody.appendChild(messageElement);
+                    });
+                    messageBody.scrollTop = messageBody.scrollHeight;
+                });
+                
+                fragment.appendChild(conversationElement);
+            });
+            
+            conversationList.appendChild(fragment);
+            messageHeaderBack.addEventListener('click', () => {
+                messageThread.classList.remove('visible');
+                conversationList.style.display = 'block';
+            });
+            
+            messageSend.addEventListener('click', () => {
+                const messageText = messageInput.value.trim();
+                if (messageText) {
+                    const messageElement = document.createElement('div');
+                    messageElement.className = 'message outgoing';
+                    
+                    const now = new Date();
+                    const hours = now.getHours() % 12 || 12;
+                    const minutes = now.getMinutes().toString().padStart(2, '0');
+                    const ampm = now.getHours() >= 12 ? 'PM' : 'AM';
+                    const timeString = `${hours}:${minutes} ${ampm}`;
+                    
+                    messageElement.innerHTML = `
+                        <div class="message-text">${messageText}</div>
+                        <div class="message-time">${timeString}</div>
+                    `;
+                    
+                    messageBody.appendChild(messageElement);
+                    messageInput.value = '';
+                    
+                    messageBody.scrollTop = messageBody.scrollHeight;
+                }
+            });
+            
+            messageInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    messageSend.click();
+                }
+            });
+        }
+
+        function generateTweets(count = 10) {
+            const newTweets = [];
+            
+            for (let i = 0; i < count; i++) {
+                const userIndex = Math.floor(Math.random() * users.length);
+                const contentIndex = Math.floor(Math.random() * tweetContents.length);
+                const imageIndex = Math.floor(Math.random() * tweetImages.length);
+                
+                newTweets.push({
+                    id: Date.now() + i,
+                    user: users[userIndex],
+                    content: tweetContents[contentIndex],
+                    image: tweetImages[imageIndex],
+                    time: getRandomDate(),
+                    likes: Math.floor(Math.random() * 500),
+                    retweets: Math.floor(Math.random() * 100),
+                    comments: Math.floor(Math.random() * 50),
+                    liked: false,
+                    retweeted: false
+                });
+            }
+            
+            return newTweets;
+        }
+
+        function renderTweet(tweet) {
+            const tweetElement = document.createElement('div');
+            tweetElement.className = 'tweet';
+            tweetElement.dataset.id = tweet.id;
+            
+            let retweetedByHtml = '';
+            if (tweet.retweetedBy) {
+                retweetedByHtml = `
+                    <div class="retweeted-by">
+                        <i class="fas fa-retweet"></i>
+                        <span>${tweet.retweetedBy.name} Retweeted</span>
+                    </div>
+                `;
+            }
+            
+            const imageHtml = tweet.image 
+                ? `<div class="tweet-image"><img src="${tweet.image}" alt="Tweet image"></div>` 
+                : '';
+                
+            const verifiedBadge = tweet.user.verified 
+                ? `<i class="fas fa-badge-check verified-badge"></i>` 
+                : '';
+            
+            tweetElement.innerHTML = `
+                ${retweetedByHtml}
+                <div class="tweet-main-content">
+                    <div class="profile-pic">
+                        ${tweet.user.profilePic}
+                    </div>
+                    <div class="tweet-content">
+                        <div class="tweet-header">
+                            <span class="tweet-name">${tweet.user.name}${verifiedBadge}</span>
+                            <span class="tweet-username">${tweet.user.username}</span>
+                            <span class="tweet-time">· ${tweet.time}</span>
+                            <div class="tweet-more">
+                                <i class="fas fa-ellipsis-h"></i>
+                            </div>
+                        </div>
+                        <div class="tweet-text">${tweet.content}</div>
+                        ${imageHtml}
+                        <div class="tweet-actions">
+                            <div class="tweet-action reply">
+                                <i class="far fa-comment"></i>
+                                <span>${tweet.comments}</span>
+                            </div>
+                            <div class="tweet-action retweet ${tweet.retweeted ? 'active' : ''}">
+                                <i class="fas fa-retweet"></i>
+                                <span>${tweet.retweets + (tweet.retweeted ? 1 : 0)}</span>
+                            </div>
+                            <div class="tweet-action like ${tweet.liked ? 'active' : ''}">
+                                <i class="${tweet.liked ? 'fas' : 'far'} fa-heart"></i>
+                                <span>${tweet.likes + (tweet.liked ? 1 : 0)}</span>
+                            </div>
+                            <div class="tweet-action share">
+                                <i class="fas fa-share-alt"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            const likeButton = tweetElement.querySelector('.tweet-action.like');
+            const retweetButton = tweetElement.querySelector('.tweet-action.retweet');
+            
+            likeButton.addEventListener('click', () => {
+                const tweetIndex = tweets.findIndex(t => t.id == tweet.id);
+                if (tweetIndex !== -1) {
+                    tweets[tweetIndex].liked = !tweets[tweetIndex].liked;
+                    if (tweets[tweetIndex].liked) {
+                        tweets[tweetIndex].likes++;
+                        likeButton.classList.add('active');
+                        likeButton.querySelector('i').className = 'fas fa-heart';
+                    } else {
+                        tweets[tweetIndex].likes--;
+                        likeButton.classList.remove('active');
+                        likeButton.querySelector('i').className = 'far fa-heart';
+                    }
+                    likeButton.querySelector('span').textContent = tweets[tweetIndex].likes;
+                }
+            });
+            
+            retweetButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                currentRetweetTweetId = tweet.id;
+                retweetDialog.classList.add('visible');
+            });
+            
+            return tweetElement;
+        }
+
+        function renderTweets() {
+            const fragment = document.createDocumentFragment();
+            
+            tweets.forEach(tweet => {
+                const tweetElement = renderTweet(tweet);
+                fragment.appendChild(tweetElement);
+            });
+            
+            tweetFeed.appendChild(fragment);
+        }
+
+        function fetchTweets() {
+            if (isLoading) return;
+            
+            isLoading = true;
+            loadingIndicator.classList.add('visible');
+            
+            setTimeout(() => {
+                const newTweets = generateTweets(10);
+                tweets = [...tweets, ...newTweets];
+                
+                const fragment = document.createDocumentFragment();
+                newTweets.forEach(tweet => {
+                    const tweetElement = renderTweet(tweet);
+                    fragment.appendChild(tweetElement);
+                });
+                tweetFeed.appendChild(fragment);
+                
+                page++;
+                isLoading = false;
+                loadingIndicator.classList.remove('visible');
+            }, 1000);
+        }
+
+        function createTweet(content, image = null) {
+            if (!content.trim() && !image) return;
+            
+            const newTweet = {
+                id: Date.now(),
+                user: currentUser,
+                content,
+                image: image,
+                time: 'now',
+                likes: 0,
+                retweets: 0,
+                comments: 0,
+                liked: false,
+                retweeted: false
+            };
+            
+            tweets.unshift(newTweet);
+            
+            const tweetElement = renderTweet(newTweet);
+            tweetFeed.insertBefore(tweetElement, tweetFeed.firstChild);
+            tweetTextareas.forEach(textarea => {
+                textarea.value = '';
+                textarea.style.height = '';
+            });
+            document.querySelectorAll('.compose-image-preview').forEach(preview => {
+                preview.style.display = 'none';
+                preview.querySelector('img').src = '';
+            });
+            selectedImage = null;
+            selectedImageModal = null;
+            
+            composeModal.querySelector('.modal-title').textContent = 'Compose Tweet';
+            
+            composeModal.classList.remove('visible');
+            
+            const notification = document.createElement('div');
+            notification.style.position = 'fixed';
+            notification.style.bottom = '80px';
+            notification.style.left = '50%';
+            notification.style.transform = 'translateX(-50%)';
+            notification.style.backgroundColor = 'rgba(29, 155, 240, 0.9)';
+            notification.style.color = 'white';
+            notification.style.padding = '10px 20px';
+            notification.style.borderRadius = '30px';
+            notification.style.zIndex = '1000';
+            notification.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+            notification.style.fontWeight = 'bold';
+            notification.style.display = 'flex';
+            notification.style.alignItems = 'center';
+            notification.style.gap = '8px';
+            notification.innerHTML = '<i class="fas fa-check"></i> Your Tweet was sent';
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transition = 'opacity 0.5s ease';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 500);
+            }, 2000);
+        }
+
+        function checkScroll() {
+            if (isLoading || activeTab !== 'home') return;
+            
+            const scrollPos = mainElement.scrollTop + mainElement.clientHeight;
+            const feedBottom = tweetFeed.offsetHeight;
+            
+            if (scrollPos >= feedBottom - 200) {
+                fetchTweets();
+            }
+        }
+
+        function handleRetweet(tweetId) {
+            const tweetIndex = tweets.findIndex(t => t.id == tweetId);
+            
+            if (tweetIndex !== -1) {
+                const tweet = tweets[tweetIndex];
+                
+                tweet.retweeted = !tweet.retweeted;
+                
+                if (tweet.retweeted) {
+                    tweet.retweets++;
+                    
+                    const retweetedTweet = {
+                        id: Date.now(),
+                        retweetedBy: currentUser,
+                        originalTweet: tweet,
+                        user: tweet.user,
+                        content: tweet.content,
+                        image: tweet.image,
+                        time: 'now',
+                        likes: tweet.likes,
+                        retweets: tweet.retweets,
+                        comments: tweet.comments,
+                        liked: tweet.liked,
+                        retweeted: true,
+                        isRetweet: true
+                    };
+                    
+                    tweets.unshift(retweetedTweet);
+                    
+                    if (notificationsData.length > 0) {
+                        notificationsData.unshift({
+                            id: Date.now(),
+                            type: 'retweet',
+                            users: [currentUser],
+                            text: 'retweeted your Tweet',
+                            tweetContent: tweet.content,
+                            time: 'now'
+                        });
+                    }
+                    
+                    const notification = document.createElement('div');
+                    notification.style.position = 'fixed';
+                    notification.style.bottom = '80px';
+                    notification.style.left = '50%';
+                    notification.style.transform = 'translateX(-50%)';
+                    notification.style.backgroundColor = 'rgba(0, 186, 124, 0.9)';
+                    notification.style.color = 'white';
+                    notification.style.padding = '10px 20px';
+                    notification.style.borderRadius = '30px';
+                    notification.style.zIndex = '1000';
+                    notification.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+                    notification.style.fontWeight = 'bold';
+                    notification.style.display = 'flex';
+                    notification.style.alignItems = 'center';
+                    notification.style.gap = '8px';
+                    notification.innerHTML = '<i class="fas fa-retweet"></i> Retweeted!';
+                    document.body.appendChild(notification);
+                    
+                    setTimeout(() => {
+                        notification.style.opacity = '0';
+                        notification.style.transition = 'opacity 0.5s ease';
+                        setTimeout(() => {
+                            document.body.removeChild(notification);
+                        }, 500);
+                    }, 2000);
+                } else {
+                    tweet.retweets--;
+                    
+                    const retweetIndex = tweets.findIndex(t => t.isRetweet && t.originalTweet && t.originalTweet.id === tweetId);
+                    if (retweetIndex !== -1) {
+                        tweets.splice(retweetIndex, 1);
+                    }
+                }
+                
+                if (activeTab === 'home') {
+                    tweetFeed.innerHTML = '';
+                    renderTweets();
+                }
+            }
+            
+            retweetDialog.classList.remove('visible');
+        }
+        
+        function handleQuoteRetweet(tweetId) {
+            const tweetIndex = tweets.findIndex(t => t.id == tweetId);
+            
+            if (tweetIndex !== -1) {
+                const tweet = tweets[tweetIndex];
+                
+                composeModal.classList.add('visible');
+                
+                const textarea = composeModal.querySelector('textarea');
+                textarea.focus();
+                
+                composeModal.querySelector('.modal-title').textContent = 'Quote Tweet';
+            }
+            
+            retweetDialog.classList.remove('visible');
+        }
+
+        function renderExplore() {
+            tweetFeed.innerHTML = `
+                <div style="padding: 1rem;">
+                    <div style="background-color: var(--input-bg); border-radius: 9999px; padding: 0.75rem 1rem; display: flex; align-items: center; margin-bottom: 1rem;">
+                        <i class="fas fa-search" style="color: var(--twitter-dark-gray); margin-right: 1rem;"></i>
+                        <input type="text" placeholder="Search Twitter" style="background: transparent; border: none; outline: none; flex: 1; color: var(--text-color);">
+                    </div>
+                    
+                    <div style="margin-bottom: 1rem; background-color: var(--card-bg); border-radius: 16px; overflow: hidden; border: 1px solid var(--border-color);">
+                        <img src="https://images.pexels.com/photos/1619317/pexels-photo-1619317.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" style="width: 100%; height: 200px; object-fit: cover;">
+                        <div style="padding: 1rem;">
+                            <div style="font-size: 0.8rem; color: var(--twitter-dark-gray); margin-bottom: 0.5rem;">Trending • Technology</div>
+                            <div style="font-weight: 700; font-size: 1.2rem; margin-bottom: 0.5rem;">AI assistants are transforming productivity</div>
+                            <div style="color: var(--twitter-dark-gray); font-size: 0.9rem;">52.3K Tweets</div>
+                        </div>
+                    </div>
+                    
+                    <div style="font-weight: 800; font-size: 1.2rem; padding: 0.5rem 0; margin-bottom: 0.5rem;">Trends for you</div>
+                    
+                    <div style="background-color: var(--card-bg); border-radius: 16px; overflow: hidden; border: 1px solid var(--border-color);">
+                        <div style="padding: 1rem; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='var(--hover-bg)'" onmouseout="this.style.backgroundColor='transparent'">
+                            <div style="font-size: 0.8rem; color: var(--twitter-dark-gray); margin-bottom: 0.25rem;">Trending in Technology</div>
+                            <div style="font-weight: 700; margin-bottom: 0.25rem;">#WebDevelopment</div>
+                            <div style="color: var(--twitter-dark-gray); font-size: 0.9rem;">18.2K Tweets</div>
+                        </div>
+                        
+                        <div style="padding: 1rem; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='var(--hover-bg)'" onmouseout="this.style.backgroundColor='transparent'">
+                            <div style="font-size: 0.8rem; color: var(--twitter-dark-gray); margin-bottom: 0.25rem;">Trending in Sports</div>
+                            <div style="font-weight: 700; margin-bottom: 0.25rem;">#Champions</div>
+                            <div style="color: var(--twitter-dark-gray); font-size: 0.9rem;">42.5K Tweets</div>
+                        </div>
+                        
+                        <div style="padding: 1rem; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='var(--hover-bg)'" onmouseout="this.style.backgroundColor='transparent'">
+                            <div style="font-size: 0.8rem; color: var(--twitter-dark-gray); margin-bottom: 0.25rem;">Trending in Music</div>
+                            <div style="font-weight: 700; margin-bottom: 0.25rem;">#NewMusic</div>
+                            <div style="color: var(--twitter-dark-gray); font-size: 0.9rem;">31.7K Tweets</div>
+                        </div>
+                        
+                        <div style="padding: 1rem; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='var(--hover-bg)'" onmouseout="this.style.backgroundColor='transparent'">
+                            <div style="font-size: 0.8rem; color: var(--twitter-dark-gray); margin-bottom: 0.25rem;">Trending in Travel</div>
+                            <div style="font-weight: 700; margin-bottom: 0.25rem;">#Wanderlust</div>
+                            <div style="color: var(--twitter-dark-gray); font-size: 0.9rem;">24.3K Tweets</div>
+                        </div>
+                        
+                        <div style="padding: 1rem; cursor: pointer; transition: background-color 0.2s ease; color: var(--twitter-blue);" onmouseover="this.style.backgroundColor='var(--hover-bg)'" onmouseout="this.style.backgroundColor='transparent'">
+                            Show more
+                        </div>
+                    </div>
+                    
+                    <div style="font-weight: 800; font-size: 1.2rem; padding: 1rem 0 0.5rem 0; margin-top: 1rem;">Who to follow</div>
+                    
+                    <div style="background-color: var(--card-bg); border-radius: 16px; overflow: hidden; border: 1px solid var(--border-color); margin-bottom: 2rem;">
+                        <div style="padding: 1rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='var(--hover-bg)'" onmouseout="this.style.backgroundColor='transparent'">
+                            <div style="display: flex; align-items: center;">
+                                <div style="width: 48px; height: 48px; border-radius: 50%; overflow: hidden; margin-right: 12px;">
+                                    ${generateUserIcon()}
+                                </div>
+                                <div>
+                                    <div style="font-weight: 700;">Tech Insider <i class="fas fa-badge-check verified-badge"></i></div>
+                                    <div style="color: var(--twitter-dark-gray); font-size: 0.9rem;">@techinsider</div>
+                                </div>
+                            </div>
+                            <button style="background-color: var(--text-color); color: var(--bg-color); border: none; border-radius: 9999px; padding: 0.5rem 1rem; font-weight: 700; cursor: pointer;">Follow</button>
+                        </div>
+                        
+                        <div style="padding: 1rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='var(--hover-bg)'" onmouseout="this.style.backgroundColor='transparent'">
+                            <div style="display: flex; align-items: center;">
+                                <div style="width: 48px; height: 48px; border-radius: 50%; overflow: hidden; margin-right: 12px;">
+                                    ${generateUserIcon()}
+                                </div>
+                                <div>
+                                    <div style="font-weight: 700;">Travel Nomad <i class="fas fa-badge-check verified-badge"></i></div>
+                                    <div style="color: var(--twitter-dark-gray); font-size: 0.9rem;">@travelnomad</div>
+                                </div>
+                            </div>
+                            <button style="background-color: var(--text-color); color: var(--bg-color); border: none; border-radius: 9999px; padding: 0.5rem 1rem; font-weight: 700; cursor: pointer;">Follow</button>
+                        </div>
+                        
+                        <div style="padding: 1rem; display: flex; align-items: center; justify-content: space-between; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='var(--hover-bg)'" onmouseout="this.style.backgroundColor='transparent'">
+                            <div style="display: flex; align-items: center;">
+                                <div style="width: 48px; height: 48px; border-radius: 50%; overflow: hidden; margin-right: 12px;">
+                                    ${generateUserIcon()}
+                                </div>
+                                <div>
+                                    <div style="font-weight: 700;">Design Hub</div>
+                                    <div style="color: var(--twitter-dark-gray); font-size: 0.9rem;">@designhub</div>
+                                </div>
+                            </div>
+                            <button style="background-color: var(--text-color); color: var(--bg-color); border: none; border-radius: 9999px; padding: 0.5rem 1rem; font-weight: 700; cursor: pointer;">Follow</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function checkWindowSize() {
+            const wasMobile = isMobile;
+            isMobile = window.innerWidth < 768;
+            if (wasMobile !== isMobile) {
+                updateComposeFabVisibility();
+            }
+        }
+
+        function init() {
+            checkWindowSize();
+            
+            darkMode = true;
+            document.documentElement.setAttribute('data-theme', 'dark');
+            document.getElementById('theme-toggle').innerHTML = '<i class="fas fa-sun"></i>';
+            localStorage.setItem('twitter-clone-theme', 'dark');
+            
+            tweets = generateTweets(10);
+            renderTweets();
+            
+            updateComposeFabVisibility();
+            
+            mainElement.addEventListener('scroll', checkScroll);
+            window.addEventListener('resize', checkWindowSize);
+            
+            document.getElementById('theme-toggle').addEventListener('click', toggleDarkMode);
+            
+            composeFab.addEventListener('click', () => {
+                composeModal.classList.add('visible');
+                setTimeout(() => {
+                    composeModal.querySelector('textarea').focus();
+                }, 300);
+            });
+            
+            modalClose.addEventListener('click', () => {
+                composeModal.classList.remove('visible');
+            });
+            
+            composeModal.addEventListener('click', (e) => {
+                if (e.target === composeModal) {
+                    composeModal.classList.remove('visible');
+                }
+            });
+            navItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    navItems.forEach(navItem => navItem.classList.remove('active'));
+                    item.classList.add('active');
+                    activeTab = item.dataset.tab;
+                    
+                    updateComposeFabVisibility();
+                    
+                    switch (activeTab) {
+                        case 'home':
+                            tweetFeed.innerHTML = '';
+                            renderTweets();
+                            break;
+                        case 'notifications':
+                            renderNotifications();
+                            break;
+                        case 'messages':
+                            renderMessages();
+                            break;
+                        case 'explore':
+                            renderExplore();
+                            break;
+                    }
+                });
+            });
+            const modalTweetButton = document.querySelector('#modal-tweet-button');
+            if (modalTweetButton) {
+                modalTweetButton.addEventListener('click', () => {
+                    const textarea = modalTweetButton.closest('.compose-tweet').querySelector('textarea');
+                    const content = textarea.value.trim();
+                    if (content || selectedImageModal) {
+                        createTweet(content, selectedImageModal);
+                    }
+                });
+            }
+            
+            tweetButtons.forEach(button => {
+                if (button.id === 'modal-tweet-button') return;
+                
+                const textarea = button.closest('.compose-tweet').querySelector('textarea');
+                
+                const updateButtonState = () => {
+                    if (textarea.value.trim() || selectedImage) {
+                        button.classList.add('active');
+                    } else {
+                        button.classList.remove('active');
+                    }
+                };
+                
+                textarea.addEventListener('input', updateButtonState);
+                
+                button.addEventListener('click', () => {
+                    if (isMobile) {
+                        composeModal.classList.add('visible');
+                        setTimeout(() => {
+                            composeModal.querySelector('textarea').focus();
+                        }, 300);
+                    } else {
+                        const content = textarea.value.trim();
+                        if (content || selectedImage) {
+                            createTweet(content, selectedImage);
+                        }
+                    }
+                });
+            });
+            
+            retweetOption.addEventListener('click', () => {
+                if (currentRetweetTweetId) {
+                    handleRetweet(currentRetweetTweetId);
+                }
+            });
+            
+            quoteRetweetOption.addEventListener('click', () => {
+                if (currentRetweetTweetId) {
+                    handleQuoteRetweet(currentRetweetTweetId);
+                }
+            });
+            
+            document.addEventListener('click', (e) => {
+                if (retweetDialog.classList.contains('visible') && 
+                    !retweetDialog.contains(e.target) && 
+                    !e.target.closest('.tweet-action.retweet')) {
+                    retweetDialog.classList.remove('visible');
+                }
+            });
+            
+            tweetTextareas.forEach(textarea => {
+                textarea.addEventListener('input', () => {
+                    textarea.style.height = '';
+                    textarea.style.height = Math.min(textarea.scrollHeight, 150) + 'px';
+                });
+            });
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            init();
+            
+            setupImageUploads();
+        });
+        
+        function setupImageUploads() {
+            const mainImageUpload = document.getElementById('image-upload');
+            const mainImagePreview = document.querySelector('.compose-tweet:not(.in-modal) .compose-image-preview');
+            const mainRemoveImage = mainImagePreview.querySelector('.remove-image');
+            
+            mainImageUpload.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        selectedImage = event.target.result;
+                        mainImagePreview.querySelector('img').src = selectedImage;
+                        mainImagePreview.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+            
+            mainRemoveImage.addEventListener('click', () => {
+                mainImagePreview.style.display = 'none';
+                mainImagePreview.querySelector('img').src = '';
+                mainImageUpload.value = '';
+                selectedImage = null;
+            });
+            
+            const modalImageUpload = document.getElementById('modal-image-upload');
+            const modalImagePreview = document.querySelector('.compose-tweet.in-modal .compose-image-preview');
+            const modalRemoveImage = modalImagePreview.querySelector('.remove-image');
+            
+            modalImageUpload.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        selectedImageModal = event.target.result;
+                        modalImagePreview.querySelector('img').src = selectedImageModal;
+                        modalImagePreview.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+            
+            modalRemoveImage.addEventListener('click', () => {
+                modalImagePreview.style.display = 'none';
+                modalImagePreview.querySelector('img').src = '';
+                modalImageUpload.value = '';
+                selectedImageModal = null;
+            });
+        }
+    </script>
+</body>
+</html>

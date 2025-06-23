@@ -1,0 +1,2942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Urban Traffic Management Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        secondary: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            200: '#ddd6fe',
+                            300: '#c4b5fd',
+                            400: '#a78bfa',
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                            700: '#6d28d9',
+                            800: '#5b21b6',
+                            900: '#4c1d95',
+                        },
+                        dark: {
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        },
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>    <style>
+        input:checked ~ .dot {
+            transform: translateX(100%);
+            background-color: white;
+        }
+        
+        input:checked ~ .block {
+            background-color: #0ea5e9;
+        }
+        
+        .dot {
+            transition: all 0.3s ease-in-out;
+        }
+        
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            
+            body {
+                background: white;
+                color: black;
+            }
+            
+            .panel {
+                box-shadow: none;
+                border: 1px solid #e5e7eb;
+            }
+            
+            .map-container {
+                page-break-inside: avoid;
+            }
+            
+            .print-header {
+                text-align: center;
+                margin-bottom: 20px;
+            }
+            
+            .print-footer {
+                text-align: center;
+                margin-top: 20px;
+                font-size: 12px;
+                color: #6b7280;
+            }
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #334155;
+            overflow-x: hidden;
+        }
+        
+        /* Layout styles */
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            min-height: 100vh;
+        }
+        
+        .main-content {
+            padding: 1.5rem;
+        }
+        
+        /* Sidebar styles */
+        .sidebar {
+            background-color: #fff;
+            border-right: 1px solid rgba(0,0,0,0.05);
+            height: 100vh;
+            position: fixed;
+            width: 240px;
+            z-index: 10;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            padding: 1.5rem 0;
+        }
+        
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: #64748b;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .sidebar-link:hover {
+            background-color: rgba(14, 165, 233, 0.05);
+            color: #0ea5e9;
+        }
+        
+        .sidebar-link.active {
+            color: #0ea5e9;
+            background-color: rgba(14, 165, 233, 0.08);
+            border-left: 3px solid #0ea5e9;
+        }
+        
+        .sidebar-link i {
+            font-size: 1.25rem;
+            margin-right: 0.75rem;
+        }
+        
+        /* Tab content styles */
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Card styles */
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.08);
+        }
+        
+        .card-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        /* Stat card styles */
+        .stat-card {
+            padding: 1.25rem;
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-3px);
+        }
+        
+        .stat-card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+        
+        .stat-card-content {
+            flex: 1;
+        }
+        
+        .stat-card-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        
+        .stat-card-label {
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+        
+        /* Map styles */
+        .map-container {
+            height: 550px;
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            background-color: #f8fafc;
+        }
+        
+        .zone {
+            position: absolute;
+            border: 2px solid rgba(51, 51, 51, 0.5);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            text-shadow: 0px 0px 2px rgba(255,255,255,0.5);
+            font-size: 0.9rem;
+            padding: 0.5rem;
+            line-height: 1.2;
+        }        .zone:hover {
+            transform: scale(1.05);
+            z-index: 10;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+        }
+        
+        .zone.selected {
+            border: 2px solid #0ea5e9;
+            box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.2);
+        }
+        
+        /* Add animation for summary map zone updates */
+        .zone.updating {
+            animation: pulse-update 0.5s ease-out;
+        }
+        
+        @keyframes pulse-update {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 1; box-shadow: 0 0 10px rgba(255,255,255,0.8); }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+        
+        /* Summary zone styles */
+        .zone.summary-zone {
+            font-size: 0.75rem;
+            cursor: default;
+        }
+        
+        .accident-marker.summary-marker {
+            width: 16px;
+            height: 16px;
+            font-size: 10px;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .map-legend {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background-color: white;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 5;
+            max-width: 280px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            padding: 6px 8px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        
+        .legend-item:hover {
+            background-color: rgba(0,0,0,0.03);
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            border-radius: 4px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .accident-marker {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background-color: #ef4444;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 13px;
+            z-index: 5;
+            box-shadow: 0 0 0 2px rgba(255,255,255,0.7), 0 3px 8px rgba(0,0,0,0.3);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        /* Control styles */
+        .control-panel {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .filter-group {
+            margin-bottom: 1rem;
+        }
+        
+        .filter-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #64748b;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        
+        /* Button styles */
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .btn i {
+            margin-right: 0.5rem;
+        }
+        
+        .btn-primary {
+            background-color: #0ea5e9;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #0284c7;
+        }
+        
+        .btn-secondary {
+            background-color: #f1f5f9;
+            color: #334155;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e2e8f0;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn-sm {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.875rem;
+        }
+        
+        /* Form control styles */
+        .form-control {
+            display: block;
+            width: 100%;
+            padding: 0.625rem 1rem;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            color: #1e293b;
+            background-color: #fff;
+            background-clip: padding-box;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        
+        .form-control:focus {
+            border-color: #0ea5e9;
+            outline: 0;
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
+        }
+        
+        .form-select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.75rem center;
+            background-repeat: no-repeat;
+            background-size: 1.25rem;
+            padding-right: 2.5rem;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+        
+        /* Badge styles */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 9999px;
+        }
+        
+        /* Utilities */
+        .icon-box {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        /* Notification */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 1rem;
+            border-radius: 8px;
+            background: white;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            max-width: 400px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        /* Toggle Switch */
+        input:checked ~ .dot {
+            transform: translateX(100%);
+            background-color: white;
+        }
+        
+        input:checked ~ .block {
+            background-color: #0ea5e9;
+        }
+        
+        .dot {
+            transition: all 0.3s ease-in-out;
+        }
+        
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            
+            body {
+                background: white;
+                color: black;
+            }
+            
+            .panel {
+                box-shadow: none;
+                border: 1px solid #e5e7eb;
+            }
+            
+            .map-container {
+                page-break-inside: avoid;
+            }
+            
+            .print-header {
+                text-align: center;
+                margin-bottom: 20px;
+            }
+            
+            .print-footer {
+                text-align: center;
+                margin-top: 20px;
+                font-size: 12px;
+                color: #6b7280;
+            }
+        }
+        
+        /* Notification */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 1rem;
+            border-radius: 8px;
+            background: white;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            max-width: 400px;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        /* Tab Navigation */
+        .tab-nav {
+            display: flex;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        
+        .tab-nav::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .tab-btn {
+            padding: 0.75rem 1.25rem;
+            font-weight: 500;
+            color: #64748b;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+        }
+        
+        .tab-btn i {
+            margin-right: 0.5rem;
+            font-size: 1.25rem;
+        }
+        
+        .tab-btn:hover {
+            color: #334155;
+        }
+        
+        .tab-btn.active {
+            color: #0ea5e9;
+            border-bottom: 2px solid #0ea5e9;
+        }
+          /* Responsive adjustments */
+        @media (max-width: 1280px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                position: fixed;
+                left: -240px;
+                transition: left 0.3s ease;
+            }
+              
+            .sidebar.show {
+                left: 0;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+        }
+        
+        @media (max-width: 1024px) {
+            .map-container {
+                height: 500px;
+            }
+            
+            /* Better spacing for tablets */
+            .gap-6 {
+                gap: 1rem;
+            }
+            
+            /* Adjust icon sizes for better visibility */
+            .text-3xl {
+                font-size: 1.5rem;
+            }
+        }
+          
+        @media (max-width: 768px) {
+            .map-container {
+                height: 400px;
+            }
+            
+            /* Fix zone sizes on small screens */
+            .zone {
+                font-size: 0.8rem;
+                padding: 0.25rem;
+            }
+            
+            .stat-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .panel {
+                margin-bottom: 1rem;
+            }
+            
+            .tab-btn {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.875rem;
+            }
+            
+            .tab-btn i {
+                margin-right: 0.25rem;
+                font-size: 1rem;
+            }
+            
+            /* Adjust card headers for mobile */
+            .card-header {
+                padding: 0.75rem 1rem;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .card-header > div:not(:first-child) {
+                margin-top: 0.5rem;
+            }
+        }
+        
+        /* Small screens and mobile devices */
+        @media (max-width: 640px) {
+            /* Header adjustments */
+            .gradient-bg h1 {
+                font-size: 1.25rem;
+            }
+            
+            .gradient-bg p {
+                font-size: 0.75rem;
+            }
+            
+            /* Map container adjustments */
+            .map-container {
+                height: 320px;
+            }
+            
+            /* Zone details for small screens */
+            .zone {
+                font-size: 0.7rem;
+            }
+            
+            /* Ensure all cards stack on mobile */
+            .grid-cols-2, 
+            .grid-cols-3, 
+            .grid-cols-4,
+            .md\\:grid-cols-2,
+            .md\\:grid-cols-3,
+            .md\\:grid-cols-4 {
+                grid-template-columns: 1fr !important;
+            }
+            
+            /* Adjust spacing for mobile */
+            .p-4 {
+                padding: 0.75rem;
+            }
+            
+            .py-4 {
+                padding-top: 0.75rem;
+                padding-bottom: 0.75rem;
+            }
+            
+            .px-4 {
+                padding-left: 0.75rem;
+                padding-right: 0.75rem;
+            }
+            
+            /* Better stacking for control elements */
+            .flex.flex-wrap {
+                flex-direction: column;
+            }
+            
+            .flex.flex-wrap > * {
+                margin-bottom: 0.5rem;
+            }
+        }
+            
+            .gap-6 {
+                gap: 0.75rem;
+            }
+            
+            /* Make buttons more touch-friendly */
+            .btn {
+                padding: 0.625rem 1rem;
+                min-height: 2.5rem;
+            }
+            
+            /* Better spacing for zone labels */
+            .zone {
+                font-size: 0.75rem;
+                padding: 0.25rem;
+            }
+            
+            .tab-btn {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.875rem;
+            }
+            
+            .tab-btn i {
+                margin-right: 0.25rem;
+                font-size: 1rem;
+            }
+            
+            /* Ensure cards stack on mobile */
+            .grid-cols-2, 
+            .grid-cols-3, 
+            .grid-cols-4 {
+                grid-template-columns: 1fr;
+            }
+            
+            /* Adjust spacing for mobile */
+            .p-4 {
+                padding: 0.75rem;
+            }
+            
+            .gap-6 {
+                gap: 0.75rem;
+            }
+            
+            /* Make buttons more touch-friendly */
+            .btn {
+                padding: 0.625rem 1rem;
+                min-height: 2.5rem;
+            }
+            
+            /* Better spacing for zone labels */
+            .zone {
+                font-size: 0.75rem;
+                padding: 0.25rem;
+            }
+        
+        /* Extra small devices */
+        @media (max-width: 480px) {
+            .text-3xl {
+                font-size: 1.5rem;
+            }
+            
+            .text-2xl {
+                font-size: 1.25rem;
+            }
+            
+            .text-xl {
+                font-size: 1.125rem;
+            }
+            
+            .panel {
+                border-radius: 8px;
+            }
+            
+            /* Stack control panel items */
+            .global-controls .flex-wrap {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .global-controls .flex-wrap > div {
+                margin-bottom: 0.5rem;
+            }
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.25rem;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);            transition: all 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);        }
+        
+        .panel {
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+            overflow: hidden;
+        }
+        
+        .gradient-bg {
+            background-image: linear-gradient(120deg, #0ea5e9, #3b82f6);        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            outline: none;        }
+        
+        .btn:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);        }
+        
+        .btn-primary {
+            background-color: #0ea5e9;
+            color: white;        }
+        
+        .btn-primary:hover {            background-color: #0284c7;
+        }
+        
+        .btn-secondary {
+            background-color: #f3f4f6;
+            color: #374151;        }
+        
+        .btn-secondary:hover {            background-color: #e5e7eb;
+        }
+        
+        @media (max-width: 768px) {
+            .map-container {
+                height: 400px;
+            }
+        }
+        
+        /* Animation for summary map zone updates */
+        .zone.updating {
+            animation: pulse-update 0.5s ease-out;
+        }
+        
+        @keyframes pulse-update {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 1; box-shadow: 0 0 10px rgba(255,255,255,0.8); }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+        
+        /* Summary zone styles */
+        .zone.summary-zone {
+            font-size: 0.75rem;
+            cursor: default;
+        }
+        
+        .accident-marker.summary-marker {
+            width: 16px;
+            height: 16px;
+            font-size: 10px;
+            animation: pulse 1.5s infinite;
+        }
+
+        /* Responsive centering for map container */
+        .map-container {
+            margin-left: auto;
+            margin-right: auto;
+            width: 100%;
+            max-width: 700px;
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        @media (max-width: 1024px) {
+            .map-container {
+                max-width: 95vw;
+                height: 400px;
+            }
+        }
+        @media (max-width: 640px) {
+            .map-container {
+                max-width: 100vw;
+                height: 260px;
+                padding: 0 0.25rem;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="gradient-bg text-white py-3 px-4 md:px-6 shadow-md sticky top-0 z-50">
+        <div class="container mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-2 md:gap-0">
+                <div class="flex items-center space-x-2">
+                    <i class='bx bx-map-alt text-2xl md:text-3xl'></i>
+                    <div>
+                        <h1 class="text-xl md:text-2xl font-bold">Urban Traffic Dashboard</h1>
+                        <p class="text-xs md:text-sm opacity-80">Real-time monitoring system</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2 md:space-x-3 mt-2 md:mt-0">
+                    <span class="text-xs md:text-sm opacity-80 hidden md:inline-block">Last updated: <span id="last-update" class="font-semibold">May 14, 2025 13:45</span></span>
+                    <span class="inline-flex items-center px-2 md:px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        <span class="h-2 w-2 rounded-full bg-green-500 mr-1"></span> System Online
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container mx-auto px-2 md:px-4 py-4 sticky top-16 z-40 bg-gray-50 border-b border-gray-200">
+        <div class="panel p-2 md:p-4 shadow-sm">
+            <div class="flex flex-col md:flex-row flex-wrap justify-between items-center gap-2 md:gap-4">
+                <div class="flex items-center space-x-2 md:space-x-3">
+                    <div class="text-base md:text-lg font-bold text-gray-800 hidden md:block">
+                        <i class='bx bx-traffic-cone text-primary-500'></i>
+                        Traffic Center
+                    </div>
+                    <div class="relative">
+                        <select id="time-selector" class="rounded-lg border border-gray-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 pl-8 pr-4 py-2 bg-white appearance-none text-gray-700 text-xs md:text-sm">
+                            <option value="current">Current (Real-time)</option>
+                            <option value="morning">Morning Rush (7-9 AM)</option>
+                            <option value="midday">Midday (11 AM-1 PM)</option>
+                            <option value="evening">Evening Rush (4-7 PM)</option>
+                            <option value="night">Night (9 PM-12 AM)</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-2 md:pl-3 text-gray-500">
+                            <i class='bx bx-time'></i>
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <input type="date" id="date-selector" class="rounded-lg border border-gray-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 pl-8 pr-4 py-2 bg-white text-gray-700 text-xs md:text-sm">
+                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-2 md:pl-3 text-gray-500">
+                            <i class='bx bx-calendar'></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex flex-wrap gap-2 mt-2 md:mt-0">
+                    <button id="traffic-btn" class="btn btn-primary btn-sm flex items-center">
+                        <i class='bx bx-car mr-1'></i> Traffic
+                    </button>
+                    <button id="accidents-btn" class="btn btn-secondary btn-sm flex items-center">
+                        <i class='bx bx-error mr-1'></i> Accidents
+                    </button>
+                    <button id="travel-time-btn" class="btn btn-secondary btn-sm flex items-center">
+                        <i class='bx bx-time mr-1'></i> Travel Times
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container mx-auto px-2 md:px-4 py-6 mt-2">
+        <div class="tab-navigation mb-4 md:mb-6 overflow-x-auto hide-scrollbar">
+            <div class="flex border-b">
+                <button class="tab-btn active" data-tab="overview">
+                    <i class='bx bx-home-alt'></i> Overview
+                </button>
+                <button class="tab-btn" data-tab="traffic-map">
+                    <i class='bx bx-map-alt'></i> Traffic Map
+                </button>
+                <button class="tab-btn" data-tab="analytics">
+                    <i class='bx bx-line-chart'></i> Analytics
+                </button>
+                <button class="tab-btn" data-tab="historical">
+                    <i class='bx bx-history'></i> Historical Data
+                </button>
+            </div>
+        </div>
+        <div class="tab-content-container">
+            <div class="tab-content active" id="overview-tab">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                    <div class="stat-card bg-gradient-to-br from-blue-50 to-blue-100 border-l-4 border-blue-500 flex justify-between items-center">
+                        <div>
+                            <div class="text-3xl font-bold text-blue-600" id="avg-congestion">32%</div>
+                            <div class="text-sm font-medium text-gray-600 flex items-center">
+                                <i class='bx bx-bar-chart-alt mr-1'></i>
+                                Average Congestion
+                            </div>
+                        </div>
+                        <i class='bx bxs-traffic text-3xl text-blue-300'></i>
+                    </div>
+                    <div class="stat-card bg-gradient-to-br from-red-50 to-red-100 border-l-4 border-red-500 flex justify-between items-center">
+                        <div>
+                            <div class="text-3xl font-bold text-red-600" id="active-incidents">7</div>
+                            <div class="text-sm font-medium text-gray-600 flex items-center">
+                                <i class='bx bx-error-circle mr-1'></i>
+                                Active Incidents
+                            </div>
+                        </div>
+                        <i class='bx bxs-error-circle text-3xl text-red-300'></i>
+                    </div>
+                    <div class="stat-card bg-gradient-to-br from-green-50 to-green-100 border-l-4 border-green-500 flex justify-between items-center">
+                        <div>
+                            <div class="text-3xl font-bold text-green-600" id="avg-speed">27</div>
+                            <div class="text-sm font-medium text-gray-600 flex items-center">
+                                <i class='bx bx-car mr-1'></i>
+                                Avg Speed (mph)
+                            </div>
+                        </div>
+                        <i class='bx bxs-car text-3xl text-green-300'></i>
+                    </div>
+                    <div class="stat-card bg-gradient-to-br from-purple-50 to-purple-100 border-l-4 border-purple-500 flex justify-between items-center">
+                        <div>
+                            <div class="text-3xl font-bold text-purple-600" id="travel-index">1.4x</div>
+                            <div class="text-sm font-medium text-gray-600 flex items-center">
+                                <i class='bx bx-time mr-1'></i>
+                                Travel Time Index
+                            </div>
+                        </div>
+                        <i class='bx bxs-time text-3xl text-purple-300'></i>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">                  
+                     <div class="panel overflow-hidden lg:col-span-2">
+                        <div class="bg-gradient-to-r from-primary-600 to-primary-700 p-3 text-white">
+                            <div class="flex items-center justify-between">
+                                <h2 class="text-lg font-semibold flex items-center">
+                                    <i class='bx bxs-map mr-2'></i>
+                                    City Overview
+                                </h2>
+                                <div class="flex items-center space-x-2">
+                                    <span id="refresh-city-overview" class="cursor-pointer bg-white bg-opacity-10 hover:bg-opacity-20 p-1.5 rounded-full flex items-center justify-center transition-all">
+                                        <i class='bx bx-refresh'></i>
+                                    </span>
+                                    <span class="bg-white bg-opacity-20 text-xs font-semibold px-2 py-1 rounded-full flex items-center">
+                                        <span class="h-2 w-2 rounded-full bg-green-300 animate-pulse mr-1.5"></span>
+                                        LIVE
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex items-center mb-4 bg-gray-50 p-3 rounded-lg">
+                                <div class="mr-3 p-2 bg-primary-100 rounded-full">
+                                    <i class='bx bx-pulse text-primary-600 text-2xl'></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-bold text-gray-800">City Traffic Status</h3>
+                                    <p class="text-xs text-gray-600" id="city-traffic-status">Moderate traffic congestion across the city. Downtown showing heavy congestion.</p>
+                                </div>
+                            </div>
+                        
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                                <div class="flex flex-col bg-white p-3 rounded-lg shadow-sm border-l-4 border-blue-500">
+                                    <div class="text-xs text-gray-500 mb-1 flex items-center">
+                                        <i class='bx bxs-traffic-barrier text-blue-500 mr-1'></i>
+                                        Most Congested
+                                    </div>
+                                    <div class="font-bold text-sm text-gray-800" id="most-congested-zone">Downtown</div>
+                                    <div class="text-xs text-red-600 mt-1 flex items-center">
+                                        <i class='bx bxs-traffic text-sm'></i>
+                                        <span id="most-congested-pct">78%</span>
+                                        <span class="ml-2 text-gray-500">congestion</span>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col bg-white p-3 rounded-lg shadow-sm border-l-4 border-green-500">
+                                    <div class="text-xs text-gray-500 mb-1 flex items-center">
+                                        <i class='bx bx-run text-green-500 mr-1'></i>
+                                        Best Flowing
+                                    </div>
+                                    <div class="font-bold text-sm text-gray-800" id="best-flowing-zone">Uptown</div>
+                                    <div class="text-xs text-green-600 mt-1 flex items-center">
+                                        <i class='bx bxs-car text-sm'></i>
+                                        <span id="best-flowing-speed">35 mph</span>
+                                        <span class="ml-2 text-gray-500">avg. speed</span>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col bg-white p-3 rounded-lg shadow-sm border-l-4 border-red-500">
+                                    <div class="text-xs text-gray-500 mb-1 flex items-center">
+                                        <i class='bx bx-error-alt text-red-500 mr-1'></i>
+                                        Incidents
+                                    </div>
+                                    <div class="font-bold text-sm text-gray-800 flex items-center">
+                                        <span id="total-incidents">7</span>
+                                        <span class="text-xs ml-1 text-red-500">(active)</span>
+                                    </div>
+                                    <div class="text-xs text-gray-600 mt-1 flex items-center">
+                                        <i class='bx bx-map-pin text-sm text-red-500'></i>
+                                        <span id="worst-incident-zone">Industrial Zone</span>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col bg-white p-3 rounded-lg shadow-sm border-l-4 border-purple-500">
+                                    <div class="text-xs text-gray-500 mb-1 flex items-center">
+                                        <i class='bx bx-timer text-purple-500 mr-1'></i>
+                                        Avg Travel Time
+                                    </div>
+                                    <div class="font-bold text-sm text-gray-800" id="avg-travel-time">16 min</div>
+                                    <div class="text-xs text-purple-600 mt-1 flex items-center">
+                                        <i class='bx bx-time-five text-sm'></i>
+                                        <span id="travel-time-diff">+2 min</span>
+                                        <span class="ml-2 text-gray-500">vs normal</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="md:col-span-2">
+                                    <div class="bg-white p-2 rounded-lg shadow-sm">
+                                        <h3 class="text-xs font-semibold text-gray-700 mb-2 flex items-center">
+                                            <i class='bx bx-map-alt mr-1'></i>
+                                            Traffic Overview Map
+                                        </h3>
+                                        <div class="map-container relative !overflow-scroll h-64" id="summary-map">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="md:col-span-1">
+                                    <div class="bg-white p-2 rounded-lg shadow-sm h-full">
+                                        <h3 class="text-xs font-semibold text-gray-700 mb-2 flex items-center">
+                                            <i class='bx bx-grid-alt mr-1'></i>
+                                            Zone Status
+                                        </h3>
+                                        <div class="overflow-y-auto max-h-60 pr-1" id="zones-summary">
+                                            <div class="flex justify-between items-center py-1.5 border-b border-gray-100">
+                                                <div class="flex items-center">
+                                                    <div class="w-2.5 h-2.5 rounded-full bg-red-500 mr-2"></div>
+                                                    <span class="text-xs">Downtown</span>
+                                                </div>
+                                                <span class="text-xs text-gray-500">Severe</span>
+                                            </div>
+                                            <div class="flex justify-between items-center py-1.5 border-b border-gray-100">
+                                                <div class="flex items-center">
+                                                    <div class="w-2.5 h-2.5 rounded-full bg-orange-500 mr-2"></div>
+                                                    <span class="text-xs">Industrial</span>
+                                                </div>
+                                                <span class="text-xs text-gray-500">Heavy</span>
+                                            </div>
+                                            <div class="flex justify-between items-center py-1.5 border-b border-gray-100">
+                                                <div class="flex items-center">
+                                                    <div class="w-2.5 h-2.5 rounded-full bg-yellow-500 mr-2"></div>
+                                                    <span class="text-xs">Midtown</span>
+                                                </div>
+                                                <span class="text-xs text-gray-500">Moderate</span>
+                                            </div>
+                                            <div class="flex justify-between items-center py-1.5 border-b border-gray-100">
+                                                <div class="flex items-center">
+                                                    <div class="w-2.5 h-2.5 rounded-full bg-green-500 mr-2"></div>
+                                                    <span class="text-xs">Uptown</span>
+                                                </div>
+                                                <span class="text-xs text-gray-500">Low</span>
+                                            </div>
+                                            <div class="flex justify-between items-center py-1.5">
+                                                <div class="flex items-center">
+                                                    <div class="w-2.5 h-2.5 rounded-full bg-green-500 mr-2"></div>
+                                                    <span class="text-xs">Airport</span>
+                                                </div>
+                                                <span class="text-xs text-gray-500">Low</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 p-3 bg-gray-50 rounded-lg">
+                                <div class="flex justify-between items-center mb-2">
+                                    <div class="text-sm font-medium text-gray-700 flex items-center">
+                                        <i class='bx bx-trending-up mr-1.5 text-primary-500'></i>
+                                        Overall City Traffic Health
+                                    </div>
+                                    <div class="text-sm font-bold text-primary-600" id="traffic-health-pct">68%</div>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                    <div class="h-2.5 rounded-full bg-gradient-to-r from-red-500 via-yellow-500 to-green-500" id="traffic-health-bar" style="width: 68%"></div>
+                                </div>
+                                <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                    <div>Critical</div>
+                                    <div>Poor</div>
+                                    <div>Fair</div>
+                                    <div>Good</div>
+                                    <div>Excellent</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel overflow-hidden">
+                        <div class="bg-gradient-to-r from-indigo-700 to-purple-700 p-3 text-white">
+                            <h2 class="text-lg font-semibold flex items-center">
+                                <i class='bx bx-line-chart mr-2'></i>
+                                Current Trends
+                            </h2>
+                        </div>
+                        <div class="p-4">
+                            <canvas id="trends-chart" height="220"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 panel bg-gradient-to-r from-amber-50 to-orange-50 border-l-4 border-amber-500 p-4">
+                    <div class="flex items-center">
+                        <div class="rounded-full bg-amber-100 p-2 mr-3">
+                            <i class='bx bx-bell text-amber-500 text-xl'></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-amber-700">Traffic Advisory</h3>
+                            <p class="text-amber-600 text-sm">Construction on Main Street causing heavy delays. Consider alternate routes through Downtown.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 panel overflow-hidden">
+                    <div class="bg-gradient-to-r from-gray-700 to-gray-800 p-3 text-white">
+                        <h2 class="text-lg font-semibold flex items-center">
+                            <i class='bx bx-time mr-2'></i>
+                            Travel Time Index
+                        </h2>
+                    </div>
+                    <div class="p-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="space-y-3">
+                                <h3 class="font-medium text-gray-700">Major Routes</h3>
+                                <div class="space-y-2">
+                                    <div class="flex items-center justify-between">
+                                        <div class="text-sm font-medium">Downtown to Airport</div>
+                                        <div class="flex items-center">
+                                            <span class="text-sm font-bold text-red-600 mr-1">1.8x</span>
+                                            <i class='bx bx-trending-up text-red-500'></i>
+                                        </div>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-red-500 h-2 rounded-full" style="width: 80%"></div>
+                                    </div>
+                                </div>
+                                <div class="space-y-2">
+                                    <div class="flex items-center justify-between">
+                                        <div class="text-sm font-medium">Uptown to Business Park</div>
+                                        <div class="flex items-center">
+                                            <span class="text-sm font-bold text-yellow-600 mr-1">1.4x</span>
+                                            <i class='bx bx-trending-up text-yellow-500'></i>
+                                        </div>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-yellow-500 h-2 rounded-full" style="width: 60%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-3">
+                                <h3 class="font-medium text-gray-700">Highway Routes</h3>
+                                <div class="space-y-2">
+                                    <div class="flex items-center justify-between">
+                                        <div class="text-sm font-medium">North Highway</div>
+                                        <div class="flex items-center">
+                                            <span class="text-sm font-bold text-green-600 mr-1">1.1x</span>
+                                            <i class='bx bx-trending-down text-green-500'></i>
+                                        </div>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-green-500 h-2 rounded-full" style="width: 30%"></div>
+                                    </div>
+                                </div>
+                                <div class="space-y-2">
+                                    <div class="flex items-center justify-between">
+                                        <div class="text-sm font-medium">East-West Expressway</div>
+                                        <div class="flex items-center">
+                                            <span class="text-sm font-bold text-orange-600 mr-1">1.6x</span>
+                                            <i class='bx bx-trending-up text-orange-500'></i>
+                                        </div>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-orange-500 h-2 rounded-full" style="width: 70%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="traffic-map-tab">
+                <div class="grid grid-cols-1 xl:grid-cols-4 gap-6">
+                    <div class="xl:col-span-2 panel flex flex-col items-center justify-center">
+                        <div class="bg-gradient-to-r from-primary-600 to-primary-700 p-4 text-white rounded-t-lg w-full">
+                            <div class="flex items-center justify-between">
+                                <h2 class="text-xl font-semibold flex items-center">
+                                    <i class='bx bxs-map mr-2'></i>
+                                    City Traffic Map
+                                </h2>
+                                <span class="bg-white bg-opacity-20 text-xs font-semibold px-2 py-1 rounded-full">LIVE</span>
+                            </div>
+                        </div>
+                        <div class="p-4 w-full flex justify-center items-center">
+                            <div class="map-container relative !overflow-scroll w-full max-w-2xl mx-auto" id="traffic-map">
+                            </div>
+                        </div>
+                        <div class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3 w-full max-w-2xl mx-auto">
+                            <div class="legend-item">
+                                <div class="legend-color bg-green-500 opacity-80"></div>
+                                <span class="text-sm font-medium">Low Traffic</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color bg-yellow-500 opacity-80"></div>
+                                <span class="text-sm font-medium">Moderate Traffic</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color bg-orange-500 opacity-80"></div>
+                                <span class="text-sm font-medium">Heavy Traffic</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color bg-red-500 opacity-80"></div>
+                                <span class="text-sm font-medium">Severe Congestion</span>
+                            </div>
+                        </div>
+                    </div>  
+                    <div class="space-y-6 xl:col-span-2">
+                        <div class="panel overflow-hidden">
+                            <div class="bg-gradient-to-r from-gray-800 to-gray-900 p-3 text-white">
+                                <div class="flex items-center justify-between">
+                                    <h2 class="text-lg font-semibold flex items-center">
+                                        <i class='bx bx-detail mr-2'></i>
+                                        Zone Details
+                                    </h2>
+                                    <div class="flex items-center">
+                                        <span id="comparison-status" class="text-xs bg-white bg-opacity-10 px-2 py-1 rounded-full mr-2 hidden">
+                                            <i class='bx bx-analyse mr-1'></i>
+                                            Comparing Zones
+                                        </span>                        <button id="clear-comparison-btn" class="text-xs bg-white bg-opacity-20 hover:bg-opacity-30 px-2 py-1 rounded-full hidden items-center transition-all">
+                                            <i class='bx bx-refresh mr-1'></i>
+                                            Clear Comparison
+                                        </button>
+                                    </div>
+                                </div>
+                            </div><div class="p-4">
+                                <div class="flex flex-col space-y-4">
+                                    <div class="text-xs text-gray-500 flex items-center">
+                                        <i class='bx bx-info-circle mr-1'></i>
+                                        <span>Select zones on the map to compare their traffic data</span>
+                                    </div>
+                                    
+                                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                        <div id="zone-details" class="text-gray-500 italic flex flex-col items-center justify-center p-3 border border-dashed border-primary-200 rounded-lg bg-primary-50 shadow-sm min-h-[100px] overflow-hidden">
+                                            <i class='bx bx-map-pin text-lg text-primary-400'></i>
+                                            <span class="text-center">Select a primary zone</span>
+                                        </div>
+                                        
+                                        <div id="comparison-zone-details" class="text-gray-500 italic flex flex-col items-center justify-center p-3 border border-dashed border-secondary-200 rounded-lg bg-secondary-50 shadow-sm min-h-[100px] overflow-hidden">
+                                            <i class='bx bx-map text-lg text-secondary-400'></i>
+                                            <span class="text-center">Select a comparison zone</span>
+                                        </div>
+                                    </div>
+                                    <div id="zones-comparison-summary" class="hidden">
+                                        <div class="text-sm font-medium text-gray-700 mb-2 flex items-center">
+                                            <i class='bx bx-bar-chart mr-2'></i>
+                                            Zones Comparison Summary
+                                        </div>
+                                        <div id="comparison-metrics" class="bg-gray-50 rounded-lg p-3 overflow-y-auto max-h-[300px]">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="panel overflow-hidden">
+                            <div class="bg-gradient-to-r from-blue-600 to-cyan-600 p-3 text-white">
+                                <h2 class="text-lg font-semibold flex items-center">
+                                    <i class='bx bx-info-circle mr-2'></i>
+                                    Travel Advisory
+                                </h2>
+                            </div>
+                            <div class="p-4">
+                                <div class="text-sm space-y-3">
+                                    <div class="flex items-start">
+                                        <div class="bg-amber-100 rounded-full p-1 mr-2 mt-0.5">
+                                            <i class='bx bx-construction text-amber-600'></i>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-gray-700">Construction Alert</p>
+                                            <p class="text-gray-600">Road work on Main St between 5th and 8th Ave. Lane closures in effect.</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <div class="bg-red-100 rounded-full p-1 mr-2 mt-0.5">
+                                            <i class='bx bx-error text-red-600'></i>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-gray-700">Accident Report</p>
+                                            <p class="text-gray-600">Two-vehicle collision on West Bridge. Emergency services on scene.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="analytics-tab">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="panel overflow-hidden">
+                        <div class="bg-gradient-to-r from-indigo-700 to-purple-700 p-3 text-white">
+                            <h2 class="text-lg font-semibold flex items-center">
+                                <i class='bx bx-line-chart mr-2'></i>
+                                Traffic Trends
+                            </h2>
+                        </div>
+                        <div class="p-4">
+                            <canvas id="traffic-chart" height="300"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="panel overflow-hidden lg:col-span-2">
+                        
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="historical-tab">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold">Historical Traffic Data</h2>
+                    <button id="export-data-btn" class="btn btn-primary flex items-center">
+                        <i class='bx bx-download mr-2'></i>
+                        Export Data
+                    </button>
+                </div>
+                <div class="panel overflow-hidden mb-6">
+                    <div class="bg-gradient-to-r from-gray-700 to-gray-800 p-4 text-white">
+                        <div class="flex justify-between items-center">
+                            <h2 class="text-xl font-semibold flex items-center">
+                                <i class='bx bx-history mr-2'></i>
+                                Historical Comparison
+                            </h2>
+                            <div class="flex items-center space-x-1 bg-white bg-opacity-20 px-3 py-1 rounded-full text-sm">
+                                <i class='bx bx-calendar'></i>
+                                <span>Week-over-week</span>
+                            </div>
+                        </div>
+                    </div>
+            <div class="p-5">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="bg-white p-4 rounded-lg shadow-sm">
+                        <h3 class="font-semibold mb-3 text-gray-700 flex items-center">
+                            <i class='bx bx-line-chart-down text-primary-500 mr-2'></i>
+                            Traffic Patterns Comparison
+                        </h3>
+                        <div class="bg-gray-50 rounded-lg p-3">
+                            <canvas id="comparison-chart" height="250"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow-sm">
+                        <h3 class="font-semibold mb-3 text-gray-700 flex items-center">
+                            <i class='bx bx-radar text-primary-500 mr-2'></i>
+                            Congestion Analysis by Zone
+                        </h3>
+                        <div class="bg-gray-50 rounded-lg p-3">
+                            <canvas id="zone-chart" height="250"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel overflow-hidden mt-6">
+            <div class="bg-gradient-to-r from-gray-700 to-gray-800 p-3 text-white">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-lg font-semibold flex items-center">
+                        <i class='bx bx-calendar mr-2'></i>
+                        Monthly Traffic Trends
+                    </h2>
+                    <div>
+                        <button id="export-data-btn" class="bg-white bg-opacity-20 px-3 py-1 rounded-full text-sm flex items-center hover:bg-opacity-30 transition-all">
+                            <i class='bx bx-download mr-1'></i>
+                            Export Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4">
+                <canvas id="monthly-chart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+        
+        <footer class="mt-10 py-6 border-t border-gray-200">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="flex items-center space-x-2 mb-4 md:mb-0">
+                        <i class='bx bx-traffic-cone text-primary-500 text-2xl'></i>
+                        <span class="font-semibold text-gray-700">Urban Traffic Management Dashboard</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <span class="text-sm text-gray-500">© 2025 Urban Planning Department</span>
+                        <span class="text-sm text-gray-500">|</span>
+                        <span class="text-sm text-gray-500">Version 2.0</span>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        const cityZones = [
+            { id: "zone1", name: "Downtown", x: 50, y: 150, width: 120, height: 100, trafficLevel: "severe", accidents: 2, avgSpeed: 12, travelTime: 24 },
+            { id: "zone2", name: "Midtown", x: 190, y: 150, width: 150, height: 100, trafficLevel: "moderate", accidents: 1, avgSpeed: 28, travelTime: 15 },
+            { id: "zone3", name: "Uptown", x: 360, y: 150, width: 130, height: 100, trafficLevel: "low", accidents: 0, avgSpeed: 35, travelTime: 10 },
+            { id: "zone4", name: "West Side", x: 50, y: 270, width: 100, height: 160, trafficLevel: "heavy", accidents: 1, avgSpeed: 18, travelTime: 20 },
+            { id: "zone5", name: "East Side", x: 360, y: 270, width: 100, height: 160, trafficLevel: "moderate", accidents: 0, avgSpeed: 25, travelTime: 12 },
+            { id: "zone6", name: "Industrial District", x: 170, y: 270, width: 170, height: 70, trafficLevel: "heavy", accidents: 3, avgSpeed: 15, travelTime: 25 },
+            { id: "zone7", name: "University Area", x: 170, y: 360, width: 170, height: 70, trafficLevel: "moderate", accidents: 0, avgSpeed: 22, travelTime: 14 }
+        ];
+
+        const accidentSites = [
+            { zoneId: "zone1", x: 80, y: 180, severity: "Minor" },
+            { zoneId: "zone1", x: 120, y: 210, severity: "Major" },
+            { zoneId: "zone2", x: 240, y: 180, severity: "Minor" },
+            { zoneId: "zone4", x: 90, y: 330, severity: "Moderate" },
+            { zoneId: "zone6", x: 200, y: 290, severity: "Major" },
+            { zoneId: "zone6", x: 260, y: 300, severity: "Minor" },
+            { zoneId: "zone6", x: 230, y: 320, severity: "Moderate" }
+        ];
+
+        const timeBasedData = {
+            "morning": {
+                "zone1": { trafficLevel: "severe", avgSpeed: 8, travelTime: 32 },
+                "zone2": { trafficLevel: "heavy", avgSpeed: 18, travelTime: 22 },
+                "zone3": { trafficLevel: "moderate", avgSpeed: 25, travelTime: 16 },
+                "zone4": { trafficLevel: "heavy", avgSpeed: 15, travelTime: 23 },
+                "zone5": { trafficLevel: "moderate", avgSpeed: 20, travelTime: 18 },
+                "zone6": { trafficLevel: "severe", avgSpeed: 10, travelTime: 30 },
+                "zone7": { trafficLevel: "heavy", avgSpeed: 17, travelTime: 20 }
+            },
+            "midday": {
+                "zone1": { trafficLevel: "moderate", avgSpeed: 20, travelTime: 18 },
+                "zone2": { trafficLevel: "low", avgSpeed: 30, travelTime: 12 },
+                "zone3": { trafficLevel: "low", avgSpeed: 35, travelTime: 10 },
+                "zone4": { trafficLevel: "moderate", avgSpeed: 22, travelTime: 16 },
+                "zone5": { trafficLevel: "low", avgSpeed: 32, travelTime: 10 },
+                "zone6": { trafficLevel: "moderate", avgSpeed: 25, travelTime: 15 },
+                "zone7": { trafficLevel: "low", avgSpeed: 28, travelTime: 12 }
+            },
+            "evening": {
+                "zone1": { trafficLevel: "severe", avgSpeed: 10, travelTime: 30 },
+                "zone2": { trafficLevel: "heavy", avgSpeed: 16, travelTime: 24 },
+                "zone3": { trafficLevel: "moderate", avgSpeed: 22, travelTime: 18 },
+                "zone4": { trafficLevel: "severe", avgSpeed: 12, travelTime: 28 },
+                "zone5": { trafficLevel: "heavy", avgSpeed: 18, travelTime: 20 },
+                "zone6": { trafficLevel: "heavy", avgSpeed: 14, travelTime: 26 },
+                "zone7": { trafficLevel: "moderate", avgSpeed: 20, travelTime: 18 }
+            },
+            "night": {
+                "zone1": { trafficLevel: "low", avgSpeed: 35, travelTime: 10 },
+                "zone2": { trafficLevel: "low", avgSpeed: 38, travelTime: 8 },
+                "zone3": { trafficLevel: "low", avgSpeed: 40, travelTime: 7 },
+                "zone4": { trafficLevel: "low", avgSpeed: 32, travelTime: 10 },
+                "zone5": { trafficLevel: "low", avgSpeed: 35, travelTime: 8 },
+                "zone6": { trafficLevel: "low", avgSpeed: 30, travelTime: 12 },
+                "zone7": { trafficLevel: "low", avgSpeed: 34, travelTime: 10 }
+            },
+            "current": {
+                "zone1": { trafficLevel: "severe", avgSpeed: 12, travelTime: 24 },
+                "zone2": { trafficLevel: "moderate", avgSpeed: 28, travelTime: 15 },
+                "zone3": { trafficLevel: "low", avgSpeed: 35, travelTime: 10 },
+                "zone4": { trafficLevel: "heavy", avgSpeed: 18, travelTime: 20 },
+                "zone5": { trafficLevel: "moderate", avgSpeed: 25, travelTime: 12 },
+                "zone6": { trafficLevel: "heavy", avgSpeed: 15, travelTime: 25 },
+                "zone7": { trafficLevel: "moderate", avgSpeed: 22, travelTime: 14 }
+            }
+        };     
+        function initializeMap() {
+            const mapContainer = document.getElementById('traffic-map');
+            
+            cityZones.forEach(zone => {
+                const zoneElement = document.createElement('div');
+                zoneElement.id = zone.id;
+                zoneElement.className = 'zone';
+                zoneElement.style.left = `${zone.x}px`;
+                zoneElement.style.top = `${zone.y}px`;
+                zoneElement.style.width = `${zone.width}px`;
+                zoneElement.style.height = `${zone.height}px`;
+                zoneElement.textContent = zone.name;
+                
+                setZoneTrafficColor(zoneElement, zone.trafficLevel);
+                
+                zoneElement.addEventListener('click', () => {
+                    showZoneDetails(zone);
+                });
+                
+                mapContainer.appendChild(zoneElement);
+            });
+            
+            initializeSummaryMap();
+            
+            updateMapView('traffic');
+            updateTimeBasedData('current');
+            renderTrafficChart();
+            renderComparisonCharts();
+            renderTrendsChart();
+            renderMonthlyChart();
+        }
+        
+        function initializeSummaryMap() {
+            const summaryMapContainer = document.getElementById('summary-map');
+            
+            summaryMapContainer.innerHTML = '';
+            
+            cityZones.forEach(zone => {
+                const zoneElement = document.createElement('div');
+                zoneElement.id = `summary-${zone.id}`;
+                zoneElement.className = 'zone summary-zone';
+                zoneElement.style.left = `${zone.x * 0.75}px`;
+                zoneElement.style.top = `${zone.y * 0.75}px`;
+                zoneElement.style.width = `${zone.width * 0.75}px`;
+                zoneElement.style.height = `${zone.height * 0.75}px`;
+                zoneElement.textContent = zone.name;
+                zoneElement.style.fontSize = '0.75rem';
+                
+                setZoneTrafficColor(zoneElement, zone.trafficLevel);
+                
+                summaryMapContainer.appendChild(zoneElement);
+            });
+        }
+
+        function setZoneTrafficColor(element, trafficLevel) {
+            element.classList.remove('bg-green-500', 'bg-yellow-500', 'bg-orange-500', 'bg-red-500', 'bg-gray-300');
+            
+            switch(trafficLevel) {
+                case 'low':
+                    element.classList.add('bg-green-500');
+                    element.style.opacity = '0.8';
+                    break;
+                case 'moderate':
+                    element.classList.add('bg-yellow-500');
+                    element.style.opacity = '0.8';
+                    break;
+                case 'heavy':
+                    element.classList.add('bg-orange-500');
+                    element.style.opacity = '0.8';
+                    break;
+                case 'severe':
+                    element.classList.add('bg-red-500');
+                    element.style.opacity = '0.8';
+                    break;
+                default:
+                    element.classList.add('bg-gray-300');
+            }
+        }
+
+        function showTravelTimes() {
+            cityZones.forEach(zone => {
+                const zoneElement = document.getElementById(zone.id);
+                if (zoneElement) {
+                    zoneElement.textContent = `${zone.name}\n${zone.travelTime} min`;
+                    zoneElement.classList.remove('bg-green-500', 'bg-yellow-500', 'bg-orange-500', 'bg-red-500');
+                    zoneElement.classList.add('bg-blue-200');
+                    zoneElement.style.opacity = '0.9';
+                    
+                    if (zone.travelTime > 20) {
+                        zoneElement.classList.add('text-red-700');
+                    } else if (zone.travelTime > 15) {
+                        zoneElement.classList.add('text-orange-700');
+                    } else {
+                        zoneElement.classList.add('text-blue-700');
+                    }
+                }
+            });
+        }
+
+        function showTrafficConditions() {
+            cityZones.forEach(zone => {
+                const zoneElement = document.getElementById(zone.id);
+                if (zoneElement) {
+                    zoneElement.textContent = zone.name;
+                    zoneElement.classList.remove('text-red-700', 'text-orange-700', 'text-blue-700', 'bg-blue-200');
+                    setZoneTrafficColor(zoneElement, zone.trafficLevel);
+                }
+            });
+        }
+
+        function showAccidents() {
+            document.querySelectorAll('.accident-marker').forEach(marker => marker.remove());
+            
+            const mapContainer = document.getElementById('traffic-map');
+            accidentSites.forEach((accident, index) => {
+                const marker = document.createElement('div');
+                marker.className = 'accident-marker';
+                marker.style.left = `${accident.x}px`;
+                marker.style.top = `${accident.y}px`;
+                marker.textContent = '!';
+                marker.title = `${accident.severity} Accident`;
+                
+                if (accident.severity === 'Major') {
+                    marker.style.backgroundColor = '#dc2626'; 
+                    marker.style.width = '24px';
+                    marker.style.height = '24px';
+                } else if (accident.severity === 'Moderate') {
+                    marker.style.backgroundColor = '#f97316';
+                } else {
+                    marker.style.backgroundColor = '#facc15';
+                }
+                
+                mapContainer.appendChild(marker);
+            });
+        }
+
+        function hideAccidents() {
+            document.querySelectorAll('.accident-marker').forEach(marker => marker.remove());
+        }   
+        let primarySelectedZone = null;
+        let comparisonSelectedZone = null;
+        
+        function createZoneDetailsHTML(zone, isComparison = false) {
+            const timePeriod = document.getElementById('time-selector').value;
+            const zoneData = timeBasedData[timePeriod][zone.id] || zone;
+            
+            // Calculate congestion percentage based on speed
+            const maxSpeed = 40; // maximum possible speed
+            const congestionPct = Math.round(100 - (zoneData.avgSpeed / maxSpeed * 100));
+            
+            let statusClass, statusIcon, statusBg;
+            switch(zoneData.trafficLevel) {
+                case 'low': 
+                    statusClass = 'text-green-600'; 
+                    statusIcon = 'bx-check-circle';
+                    statusBg = 'bg-green-100';
+                    break;
+                case 'moderate': 
+                    statusClass = 'text-yellow-600'; 
+                    statusIcon = 'bx-info-circle';
+                    statusBg = 'bg-yellow-100';
+                    break;
+                case 'heavy': 
+                    statusClass = 'text-orange-600'; 
+                    statusIcon = 'bx-error';
+                    statusBg = 'bg-orange-100';
+                    break;
+                case 'severe': 
+                    statusClass = 'text-red-600'; 
+                    statusIcon = 'bx-x-circle';
+                    statusBg = 'bg-red-100';
+                    break;
+                default: 
+                    statusClass = 'text-gray-600';
+                    statusIcon = 'bx-help-circle';
+                    statusBg = 'bg-gray-100';
+            }
+            
+            const zoneColor = isComparison ? 'secondary' : 'primary';
+            
+            return `
+                <div class="pb-3 mb-2 border-b border-gray-200">
+                    <h3 class="font-bold text-lg text-gray-800 flex items-center">
+                        <i class='bx bx-map-pin text-${zoneColor}-500 mr-2'></i>
+                        ${zone.name}
+                    </h3>
+                    <div class="flex mt-2">
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${statusBg} ${statusClass} capitalize">
+                            <i class='bx ${statusIcon} mr-1'></i>
+                            ${zoneData.trafficLevel} Traffic
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center py-1 border-b border-gray-100">
+                        <div class="flex items-center text-gray-700">
+                            <i class='bx bx-car mr-2 text-${zoneColor}-500'></i>
+                            <span class="text-sm">Speed</span>
+                        </div>
+                        <div class="font-semibold text-sm flex items-center">
+                            <span class="text-${zoneColor}-600">${zoneData.avgSpeed} mph</span>
+                            ${isComparison && primarySelectedZone ? 
+                                `<span class="ml-1 px-1 py-0.5 text-xs rounded ${compareValues(zoneData.avgSpeed, timeBasedData[timePeriod][primarySelectedZone.id].avgSpeed, true)}">
+                                    ${getDifference(zoneData.avgSpeed, timeBasedData[timePeriod][primarySelectedZone.id].avgSpeed, true)}
+                                </span>` : ''}
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center py-1 border-b border-gray-100">
+                        <div class="flex items-center text-gray-700">
+                            <i class='bx bx-time mr-2 text-${zoneColor}-500'></i>
+                            <span class="text-sm">Travel Time</span>
+                        </div>
+                        <div class="font-semibold text-sm flex items-center">
+                            <span class="text-${zoneColor}-600">${zoneData.travelTime} min</span>
+                            ${isComparison && primarySelectedZone ? 
+                                `<span class="ml-1 px-1 py-0.5 text-xs rounded ${compareValues(zoneData.travelTime, timeBasedData[timePeriod][primarySelectedZone.id].travelTime, false)}">
+                                    ${getDifference(zoneData.travelTime, timeBasedData[timePeriod][primarySelectedZone.id].travelTime, false)}
+                                </span>` : ''}
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center py-1 border-b border-gray-100">
+                        <div class="flex items-center text-gray-700">
+                            <i class='bx bx-bar-chart-alt-2 mr-2 text-${zoneColor}-500'></i>
+                            <span class="text-sm">Congestion</span>
+                        </div>
+                        <div class="font-semibold text-sm flex items-center">
+                            <span class="text-${zoneColor}-600">${congestionPct}%</span>
+                            ${isComparison && primarySelectedZone ? 
+                                `<span class="ml-1 px-1 py-0.5 text-xs rounded ${compareValues(congestionPct, 
+                                    Math.round(100 - (timeBasedData[timePeriod][primarySelectedZone.id].avgSpeed / maxSpeed * 100)), false)}">
+                                    ${getDifference(congestionPct, 
+                                        Math.round(100 - (timeBasedData[timePeriod][primarySelectedZone.id].avgSpeed / maxSpeed * 100)), false)}
+                                </span>` : ''}
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center py-1">
+                        <div class="flex items-center text-gray-700">
+                            <i class='bx bx-error mr-2 text-${zoneColor}-500'></i>
+                            <span class="text-sm">Incidents</span>
+                        </div>
+                        <div class="font-semibold text-sm flex items-center">
+                            <span class="text-${zoneColor}-600">${zone.accidents}</span>
+                            ${isComparison && primarySelectedZone ? 
+                                `<span class="ml-1 px-1 py-0.5 text-xs rounded ${compareValues(zone.accidents, primarySelectedZone.accidents, false)}">
+                                    ${getDifference(zone.accidents, primarySelectedZone.accidents, false)}
+                                </span>` : ''}
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3 mb-1">
+                        <div class="text-xs text-gray-500 mb-1 flex justify-between">
+                            <span>Congestion Level</span>
+                            <span class="font-medium">${congestionPct}%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
+                            <div class="h-2.5 rounded-full ${getTrafficColorClass(zoneData.trafficLevel)}" 
+                                style="width: ${congestionPct}%"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Helper function to compare values between primary and comparison zones
+        function compareValues(compValue, primaryValue, higherIsBetter = true) {
+            if (compValue === primaryValue) return 'bg-gray-100 text-gray-500';
+            
+            if (higherIsBetter) {
+                return compValue > primaryValue ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700';
+            } else {
+                return compValue < primaryValue ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700';
+            }
+        }
+        
+        // Helper function to get the difference between values as a string
+        function getDifference(compValue, primaryValue, higherIsBetter = true) {
+            const diff = compValue - primaryValue;
+            const prefix = diff > 0 ? '+' : '';
+            return prefix + diff + (higherIsBetter ? '' : '');
+        }
+
+        // Helper function to get traffic color class
+        function getTrafficColorClass(trafficLevel) {
+            switch(trafficLevel) {
+                case 'low': return 'bg-green-500';
+                case 'moderate': return 'bg-yellow-500';
+                case 'heavy': return 'bg-orange-500';
+                case 'severe': return 'bg-red-500';
+                default: return 'bg-gray-500';
+            }
+        }
+        
+        // Show zone details
+        function showZoneDetails(zone) {
+            const zoneDetails = document.getElementById('zone-details');
+            const comparisonZoneDetails = document.getElementById('comparison-zone-details');
+            const clearComparisonBtn = document.getElementById('clear-comparison-btn');
+            const comparisonStatus = document.getElementById('comparison-status');
+            const zonesComparisonSummary = document.getElementById('zones-comparison-summary');
+            
+            if (!primarySelectedZone) {
+                // First selection - set as primary zone
+                primarySelectedZone = zone;
+                zoneDetails.innerHTML = createZoneDetailsHTML(zone);
+                zoneDetails.classList.remove('text-gray-500', 'italic');
+                highlightZone(zone.id, 'primary');
+            } else if (primarySelectedZone.id === zone.id) {
+                // Same zone selected again - do nothing
+                return;
+            } else if (!comparisonSelectedZone) {
+                // Second selection - set as comparison zone
+                comparisonSelectedZone = zone;
+                comparisonZoneDetails.innerHTML = createZoneDetailsHTML(zone, true);
+                comparisonZoneDetails.classList.remove('text-gray-500', 'italic');
+                
+                // Show comparison UI elements
+                clearComparisonBtn.classList.remove('hidden');
+                clearComparisonBtn.classList.add('flex');
+                comparisonStatus.classList.remove('hidden');
+                zonesComparisonSummary.classList.remove('hidden');
+                
+                highlightZone(zone.id, 'comparison');
+                updateZonesComparisonSummary();
+            } else if (comparisonSelectedZone.id === zone.id) {
+                // Same comparison zone selected again - clear comparison
+                clearComparison();
+            } else {
+                // Third selection - replace comparison zone
+                comparisonSelectedZone = zone;
+                comparisonZoneDetails.innerHTML = createZoneDetailsHTML(zone, true);
+                highlightZone(zone.id, 'comparison');
+                updateZonesComparisonSummary();
+            }
+            
+            // Add event listener to clear comparison button
+            clearComparisonBtn.onclick = clearComparison;
+        }
+          // Update the zones comparison summary
+        function updateZonesComparisonSummary() {
+            if (!primarySelectedZone || !comparisonSelectedZone) return;
+            
+            const comparisonMetrics = document.getElementById('comparison-metrics');
+            const timePeriod = document.getElementById('time-selector').value;
+            const primaryData = timeBasedData[timePeriod][primarySelectedZone.id] || primarySelectedZone;
+            const comparisonData = timeBasedData[timePeriod][comparisonSelectedZone.id] || comparisonSelectedZone;
+            
+            // Calculate congestion percentages
+            const maxSpeed = 40;
+            const primaryCongestionPct = Math.round(100 - (primaryData.avgSpeed / maxSpeed * 100));
+            const comparisonCongestionPct = Math.round(100 - (comparisonData.avgSpeed / maxSpeed * 100));
+            
+            // Speed difference
+            const speedDiff = comparisonData.avgSpeed - primaryData.avgSpeed;
+            const speedDiffClass = speedDiff > 0 ? 'text-green-600' : speedDiff < 0 ? 'text-red-600' : 'text-gray-600';
+            const speedDiffPrefix = speedDiff > 0 ? '+' : '';
+            
+            // Travel time difference
+            const timeDiff = comparisonData.travelTime - primaryData.travelTime;
+            const timeDiffClass = timeDiff < 0 ? 'text-green-600' : timeDiff > 0 ? 'text-red-600' : 'text-gray-600';
+            const timeDiffPrefix = timeDiff > 0 ? '+' : '';
+            
+            // Traffic level comparison
+            const trafficLevels = {
+                'low': 1,
+                'moderate': 2,
+                'heavy': 3,
+                'severe': 4
+            };
+            
+            const primaryTrafficLevel = trafficLevels[primaryData.trafficLevel] || 0;
+            const comparisonTrafficLevel = trafficLevels[comparisonData.trafficLevel] || 0;
+            const trafficLevelDiff = comparisonTrafficLevel - primaryTrafficLevel;
+            const trafficLevelDiffClass = trafficLevelDiff < 0 ? 'text-green-600' : trafficLevelDiff > 0 ? 'text-red-600' : 'text-gray-600';
+            
+            let trafficLevelText;
+            if (trafficLevelDiff < 0) {
+                trafficLevelText = 'Better traffic conditions';
+            } else if (trafficLevelDiff > 0) {
+                trafficLevelText = 'Worse traffic conditions';
+            } else {
+                trafficLevelText = 'Same traffic conditions';
+            }
+            
+            comparisonMetrics.innerHTML = `
+                <div class="space-y-2 text-sm">
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-600 flex items-center">
+                            <i class="bx bx-car-crash mr-1.5"></i>
+                            Traffic Conditions
+                        </span>
+                        <span class="${trafficLevelDiffClass} font-medium">${trafficLevelText}</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-600 flex items-center">
+                            <i class="bx bx-car mr-1.5"></i>
+                            Speed Difference
+                        </span>
+                        <span class="${speedDiffClass} font-medium">${speedDiffPrefix}${speedDiff} mph</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-600 flex items-center">
+                            <i class="bx bx-time mr-1.5"></i>
+                            Travel Time Difference
+                        </span>
+                        <span class="${timeDiffClass} font-medium">${timeDiffPrefix}${timeDiff} min</span>
+                    </div>
+                    <div class="border-t border-gray-200 my-2 pt-2">
+                        <span class="text-xs text-gray-500">Recommendation</span>
+                        <p class="text-gray-700 mt-1">
+                            ${comparisonData.avgSpeed > primaryData.avgSpeed 
+                                ? `<i class="bx bx-check-circle text-green-500 mr-1"></i> ${comparisonSelectedZone.name} is recommended for faster travel.` 
+                                : comparisonData.avgSpeed < primaryData.avgSpeed 
+                                    ? `<i class="bx bx-check-circle text-green-500 mr-1"></i> ${primarySelectedZone.name} is recommended for faster travel.`
+                                    : `<i class="bx bx-info-circle text-blue-500 mr-1"></i> Both zones have similar traffic conditions.`}
+                        </p>
+                    </div>
+                </div>
+            `;
+        }
+        function clearComparison() {
+            const zoneDetails = document.getElementById('zone-details');
+            const comparisonZoneDetails = document.getElementById('comparison-zone-details');
+            const clearComparisonBtn = document.getElementById('clear-comparison-btn');
+            const comparisonStatus = document.getElementById('comparison-status');
+            const zonesComparisonSummary = document.getElementById('zones-comparison-summary');
+            
+            zoneDetails.innerHTML = `
+                <i class='bx bx-map-pin text-lg text-primary-400'></i>
+                <span class="text-center">Select a primary zone</span>
+            `;
+            zoneDetails.classList.add('text-gray-500', 'italic');
+            
+            comparisonZoneDetails.innerHTML = `
+                <i class='bx bx-map mr-2 text-lg text-secondary-400'></i>
+                <span>Select a comparison zone</span>
+            `;
+            comparisonZoneDetails.classList.add('text-gray-500', 'italic');
+            
+            if (primarySelectedZone) {
+                const primaryZoneElem = document.getElementById(primarySelectedZone.id);
+                if (primaryZoneElem) {
+                    primaryZoneElem.style.border = '2px solid rgba(51, 51, 51, 0.7)';
+                    primaryZoneElem.classList.remove('ring-4', 'ring-primary-300', 'ring-opacity-50');
+                }
+            }
+            
+            if (comparisonSelectedZone) {
+                const comparisonZoneElem = document.getElementById(comparisonSelectedZone.id);
+                if (comparisonZoneElem) {
+                    comparisonZoneElem.style.border = '2px solid rgba(51, 51, 51, 0.7)';
+                    comparisonZoneElem.classList.remove('ring-4', 'ring-secondary-300', 'ring-opacity-50');
+                }
+            }
+            
+            primarySelectedZone = null;
+            comparisonSelectedZone = null;
+            
+            clearComparisonBtn.classList.add('hidden');
+            clearComparisonBtn.classList.remove('flex');
+            comparisonStatus.classList.add('hidden');
+            zonesComparisonSummary.classList.add('hidden');
+        }
+        
+        function highlightZone(zoneId, type) {
+            document.querySelectorAll('.zone').forEach(zoneElem => {
+                if ((type === 'primary' && comparisonSelectedZone && zoneElem.id === comparisonSelectedZone.id) ||
+                    (type === 'comparison' && primarySelectedZone && zoneElem.id === primarySelectedZone.id)) {
+                    return;
+                }
+                zoneElem.style.border = '2px solid rgba(51, 51, 51, 0.7)';
+                zoneElem.classList.remove('ring-4', 'ring-primary-300', 'ring-secondary-300', 'ring-opacity-50');
+            });
+            
+            const selectedZone = document.getElementById(zoneId);
+            if (type === 'primary') {
+                selectedZone.style.border = '2px solid #0ea5e9';
+                selectedZone.classList.add('ring-4', 'ring-primary-300', 'ring-opacity-50');
+            } else {
+                selectedZone.style.border = '2px solid #8b5cf6';
+                selectedZone.classList.add('ring-4', 'ring-secondary-300', 'ring-opacity-50');
+            }
+        }
+
+        function updateMapView(viewType) {
+            document.querySelectorAll('#traffic-btn, #accidents-btn, #travel-time-btn').forEach(btn => {
+                btn.classList.remove('bg-blue-500', 'text-white');
+                btn.classList.add('bg-gray-200', 'text-gray-700');
+            });
+            
+            hideAccidents();
+            
+            switch(viewType) {
+                case 'traffic':
+                    document.getElementById('traffic-btn').classList.remove('bg-gray-200', 'text-gray-700');
+                    document.getElementById('traffic-btn').classList.add('bg-blue-500', 'text-white');
+                    showTrafficConditions();
+                    break;
+                case 'accidents':
+                    document.getElementById('accidents-btn').classList.remove('bg-gray-200', 'text-gray-700');
+                    document.getElementById('accidents-btn').classList.add('bg-blue-500', 'text-white');
+                    showTrafficConditions();
+                    showAccidents(); 
+                    break;
+                case 'travel-time':
+                    document.getElementById('travel-time-btn').classList.remove('bg-gray-200', 'text-gray-700');
+                    document.getElementById('travel-time-btn').classList.add('bg-blue-500', 'text-white');
+                    showTravelTimes();
+                    break;
+            }
+        }
+
+        function updateTimeBasedData(timePeriod) {
+            const timeData = timeBasedData[timePeriod];
+            
+            cityZones.forEach(zone => {
+                if (timeData[zone.id]) {
+                    zone.trafficLevel = timeData[zone.id].trafficLevel;
+                    zone.avgSpeed = timeData[zone.id].avgSpeed;
+                    zone.travelTime = timeData[zone.id].travelTime;
+                }
+            });
+            
+            const activeButton = document.querySelector('#traffic-btn, #accidents-btn, #travel-time-btn.bg-blue-500');
+            if (activeButton) {
+                if (activeButton.id === 'traffic-btn') {
+                    showTrafficConditions();
+                } else if (activeButton.id === 'travel-time-btn') {
+                    showTravelTimes();
+                } else {
+                    showTrafficConditions();
+                    showAccidents();
+                }
+            }
+            
+            updateCityStats(timePeriod);
+        }      
+        function updateCityStats(timePeriod) {
+            const timeData = timeBasedData[timePeriod];
+            
+            let totalCongestion = 0;
+            let totalSpeed = 0;
+            let totalTravelIndex = 0;
+            
+            Object.keys(timeData).forEach(zoneId => {
+                const maxSpeed = 40;
+                const zoneData = timeData[zoneId];
+                totalSpeed += zoneData.avgSpeed;
+                totalCongestion += (100 - (zoneData.avgSpeed / maxSpeed * 100));
+                const freeFlowTime = 7;
+                totalTravelIndex += (zoneData.travelTime / freeFlowTime);
+            });
+            
+            const zoneCount = Object.keys(timeData).length;
+            const avgCongestion = Math.round(totalCongestion / zoneCount);
+            const avgSpeed = Math.round(totalSpeed / zoneCount);
+            const avgTravelIndex = (totalTravelIndex / zoneCount).toFixed(1);
+            
+            let accidentCount = accidentSites.length;
+            if (timePeriod === 'night') accidentCount = 2;
+            if (timePeriod === 'morning') accidentCount = 5;
+            if (timePeriod === 'midday') accidentCount = 3;
+            if (timePeriod === 'evening') accidentCount = 8;
+            
+            updateCardValue('avg-congestion', `${avgCongestion}%`);
+            updateCardValue('active-incidents', accidentCount);
+            updateCardValue('avg-speed', avgSpeed);
+            updateCardValue('travel-index', `${avgTravelIndex}x`);
+            
+            updateCardValue('avg-congestion-2', `${avgCongestion}%`);
+            updateCardValue('active-incidents-2', accidentCount);
+            updateCardValue('avg-speed-2', avgSpeed);
+            updateCardValue('travel-index-2', `${avgTravelIndex}x`);
+            updateSummaryMap();
+            
+            updateZoneStatusList(timePeriod);
+            
+            updateCityTrafficStatus(avgCongestion);
+            
+            const now = new Date();
+            document.getElementById('last-update').textContent = now.toLocaleString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+        
+        function updateZoneStatusList(timePeriod) {
+            const zonesSummary = document.getElementById('zones-summary');
+            const timeData = timeBasedData[timePeriod];
+            
+            const trafficLevelOrder = { 'severe': 0, 'heavy': 1, 'moderate': 2, 'low': 3 };
+            const sortedZones = [...cityZones].sort((a, b) => {
+                const aLevel = timeData[a.id]?.trafficLevel || a.trafficLevel;
+                const bLevel = timeData[b.id]?.trafficLevel || b.trafficLevel;
+                return trafficLevelOrder[aLevel] - trafficLevelOrder[bLevel];
+            });
+            
+            let zonesHTML = '';
+            
+            sortedZones.forEach(zone => {
+                const zoneData = timeData[zone.id] || zone;
+                const trafficColor = getZoneTrafficColor(zoneData.trafficLevel);
+                
+                zonesHTML += `
+                    <div class="flex justify-between items-center py-1.5 border-b border-gray-100">
+                        <div class="flex items-center">
+                            <div class="w-2.5 h-2.5 rounded-full ${trafficColor} mr-2"></div>
+                            <span class="text-xs">${zone.name}</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs text-gray-500 capitalize">${zoneData.trafficLevel}</span>
+                            <span class="text-xs text-gray-400">${zoneData.avgSpeed} mph</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            zonesSummary.innerHTML = zonesHTML;
+        }
+        
+        function getZoneTrafficColor(trafficLevel) {
+            switch(trafficLevel) {
+                case 'low': return 'bg-green-500';
+                case 'moderate': return 'bg-yellow-500';
+                case 'heavy': return 'bg-orange-500';
+                case 'severe': return 'bg-red-500';
+                default: return 'bg-gray-400';
+            }
+        }
+        
+        function updateCityTrafficStatus(congestionPct) {
+            const statusEl = document.getElementById('city-traffic-status');
+            
+            const timePeriod = document.getElementById('time-selector').value;
+            const timeData = timeBasedData[timePeriod];
+            
+            const maxSpeed = 40;
+            const sortedZones = [...cityZones].sort((a, b) => {
+                const aData = timeData[a.id] || a;
+                const bData = timeData[b.id] || b;
+                const aCongestion = 100 - (aData.avgSpeed / maxSpeed * 100);
+                const bCongestion = 100 - (bData.avgSpeed / maxSpeed * 100);
+                return bCongestion - aCongestion;
+            });
+            
+            const mostCongestedZone = sortedZones[0];
+            const leastCongestedZone = sortedZones[sortedZones.length - 1];
+            
+            let statusText = '';
+            
+            if (congestionPct < 30) {
+                statusText = `Light traffic across the city. Good travel conditions in most areas.`;
+            } else if (congestionPct < 50) {
+                statusText = `Moderate traffic with some congestion in ${mostCongestedZone.name}.`;
+            } else if (congestionPct < 70) {
+                statusText = `Heavy traffic congestion in ${mostCongestedZone.name}. Consider using ${leastCongestedZone.name} routes where possible.`;
+            } else {
+                statusText = `Severe congestion in multiple areas. ${mostCongestedZone.name} showing critical traffic levels.`;
+            }
+            
+            statusEl.textContent = statusText;
+        }
+        
+        function updateCardValue(elementId, value) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.textContent = value;
+            }
+        }
+        
+        function updateSummaryMap() {
+            cityZones.forEach(zone => {
+                const summaryZoneElement = document.getElementById(`summary-${zone.id}`);
+                if (summaryZoneElement) {
+                    setZoneTrafficColor(summaryZoneElement, zone.trafficLevel);
+                    
+                    summaryZoneElement.classList.add('updating');
+                    setTimeout(() => {
+                        summaryZoneElement.classList.remove('updating');
+                    }, 500);
+                }
+            });
+            
+            if (document.querySelectorAll('#traffic-map .accident-marker').length > 0) {
+                const summaryMapContainer = document.getElementById('summary-map');
+                
+                document.querySelectorAll('#summary-map .accident-marker').forEach(marker => marker.remove());
+                accidentSites.forEach(accident => {
+                    const marker = document.createElement('div');
+                    marker.className = 'accident-marker summary-marker';
+                    marker.style.left = `${accident.x * 0.75}px`;
+                    marker.style.top = `${accident.y * 0.75}px`;
+                    marker.textContent = '!';
+                    marker.title = `${accident.severity} Accident`;
+                    
+                    if (accident.severity === 'Major') {
+                        marker.style.backgroundColor = '#dc2626';
+                    } else if (accident.severity === 'Moderate') {
+                        marker.style.backgroundColor = '#f97316';
+                    } else {
+                        marker.style.backgroundColor = '#facc15';
+                    }
+                    
+                    summaryMapContainer.appendChild(marker);
+                });            }
+        }
+
+        function renderTrafficChart() {
+            const ctx = document.getElementById('traffic-chart').getContext('2d');
+            
+            const labels = ['12am', '3am', '6am', '9am', '12pm', '3pm', '6pm', '9pm'];
+            const data = {
+                labels: labels,
+                datasets: [{
+                    label: 'Downtown Traffic Index',
+                    data: [10, 5, 15, 70, 45, 60, 85, 40],
+                    borderColor: '#2563eb',
+                    backgroundColor: 'rgba(37, 99, 235, 0.2)',
+                    tension: 0.4,
+                    fill: true
+                }, {
+                    label: 'Industrial District Traffic Index',
+                    data: [5, 5, 25, 55, 65, 70, 60, 20],
+                    borderColor: '#dc2626',
+                    backgroundColor: 'rgba(220, 38, 38, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            };
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: data,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Congestion Index'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderComparisonCharts() {
+            const comparisonCtx = document.getElementById('comparison-chart').getContext('2d');
+            const comparisonData = {
+                labels: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+                datasets: [{
+                    label: 'This Week',
+                    data: [20, 45, 52, 48, 56, 55, 30],
+                    backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                    borderColor: 'rgb(37, 99, 235)',
+                    borderWidth: 1
+                }, {
+                    label: 'Last Week',
+                    data: [18, 42, 50, 46, 54, 50, 28],
+                    backgroundColor: 'rgba(107, 114, 128, 0.5)',
+                    borderColor: 'rgb(75, 85, 99)',
+                    borderWidth: 1
+                }]
+            };
+            
+            new Chart(comparisonCtx, {
+                type: 'bar',
+                data: comparisonData,
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Average Congestion %'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            const zoneCtx = document.getElementById('zone-chart').getContext('2d');
+            const zoneData = {
+                labels: cityZones.map(zone => zone.name),
+                datasets: [{
+                    label: 'Morning Rush',
+                    data: [75, 60, 45, 65, 40, 80, 55],
+                    backgroundColor: 'rgba(239, 68, 68, 0.7)'
+                }, {
+                    label: 'Evening Rush',
+                    data: [80, 65, 50, 85, 60, 70, 45],
+                    backgroundColor: 'rgba(220, 38, 38, 0.7)'
+                }]
+            };
+            
+            new Chart(zoneCtx, {
+                type: 'radar',
+                data: zoneData,
+                options: {
+                    elements: {
+                        line: {
+                            borderWidth: 3
+                        }
+                    },
+                    scales: {
+                        r: {
+                            angleLines: {
+                                display: true
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 100
+                        }
+                    }
+                }
+            });
+        }     
+        function renderTrendsChart() {
+            const ctx = document.getElementById('trends-chart');
+            if (!ctx) return;
+            
+            const trendsCtx = ctx.getContext('2d');
+            
+            const hours = ['6am', '9am', '12pm', '3pm', '6pm', '9pm'];
+            
+            const data = {
+                labels: hours,
+                datasets: [{
+                    label: 'Today',
+                    data: [45, 75, 60, 65, 80, 40],
+                    borderColor: 'rgba(147, 51, 234, 0.8)',
+                    backgroundColor: 'rgba(147, 51, 234, 0.2)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: true
+                }, {
+                    label: 'Yesterday',
+                    data: [40, 70, 55, 60, 75, 35],
+                    borderColor: 'rgba(107, 114, 128, 0.6)',
+                    backgroundColor: 'rgba(107, 114, 128, 0.1)',
+                    borderWidth: 1,
+                    tension: 0.4,
+                    borderDash: [5, 5],
+                    fill: true
+                }]
+            };
+            
+            new Chart(trendsCtx, {
+                type: 'line',
+                data: data,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Congestion %'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        function renderMonthlyChart() {
+            const ctx = document.getElementById('monthly-chart');
+            if (!ctx) return;
+            
+            const monthlyCtx = ctx.getContext('2d');
+            
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            
+            const data = {
+                labels: months,
+                datasets: [{
+                    type: 'line',
+                    label: 'Average Congestion',
+                    data: [35, 38, 40, 45, 43, 47, 50, 55, 48, 42, 38, 40],
+                    borderColor: 'rgba(37, 99, 235, 0.8)',
+                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.3,
+                    fill: true,
+                    yAxisID: 'y'
+                }, {
+                    type: 'bar',
+                    label: 'Traffic Incidents',
+                    data: [12, 19, 15, 23, 28, 24, 35, 30, 25, 18, 15, 20],
+                    backgroundColor: 'rgba(220, 38, 38, 0.7)',
+                    yAxisID: 'y1'
+                }]
+            };
+            
+            new Chart(monthlyCtx, {
+                type: 'scatter',
+                data: data,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Annual Traffic Trends'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'Congestion %'
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            grid: {
+                                drawOnChartArea: false
+                            },
+                            title: {
+                                display: true,
+                                text: 'Incidents'
+                            }
+                        }
+                    }
+                }
+            });
+        }// Tab switching functionality
+        function switchTab(tabId) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show the selected tab content
+            document.getElementById(tabId + '-tab').classList.add('active');
+            
+            // Set the tab button as active
+            document.querySelector(`.tab-btn[data-tab="${tabId}"]`).classList.add('active');
+        }
+
+        // Event listeners        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize the map
+            initializeMap();
+            
+            // Initialize the zone status list
+            updateZoneStatusList('current');
+            
+            // Initialize the comparison elements as hidden initially
+            document.getElementById('comparison-status').classList.add('hidden');
+            document.getElementById('zones-comparison-summary').classList.add('hidden');
+            
+            // Set current date as default
+            const today = new Date();
+            const dateInput = document.getElementById('date-selector');
+            dateInput.valueAsDate = today;
+            
+            // Set up button handlers
+            document.getElementById('traffic-btn').addEventListener('click', () => updateMapView('traffic'));
+            document.getElementById('accidents-btn').addEventListener('click', () => updateMapView('accidents'));
+            document.getElementById('travel-time-btn').addEventListener('click', () => updateMapView('travel-time'));
+            
+            // Set up tab switch handlers
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    switchTab(tabId);
+                });
+            });
+              // Set up time selector handler
+            document.getElementById('time-selector').addEventListener('change', function() {
+                updateTimeBasedData(this.value);
+            });
+            
+            // Set up refresh city overview button
+            document.getElementById('refresh-city-overview').addEventListener('click', function() {
+                // Add a spinning animation to the refresh icon
+                this.classList.add('animate-spin');
+                
+                // Simulate refresh delay
+                setTimeout(() => {
+                    // Update city stats with current time period
+                    const timePeriod = document.getElementById('time-selector').value;
+                    updateCityStats(timePeriod);
+                    
+                    // Show refresh notification
+                    const notification = document.createElement('div');
+                    notification.className = 'fixed bottom-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg flex items-center z-50';
+                    notification.innerHTML = `
+                        <i class='bx bx-check-circle text-xl mr-2'></i>
+                        <div>
+                            <div class="font-semibold">Data Updated</div>
+                            <div class="text-xs">City overview has been refreshed</div>
+                        </div>
+                        <button class="ml-4 text-white opacity-80 hover:opacity-100" onclick="this.parentElement.remove()">
+                            <i class='bx bx-x'></i>
+                        </button>
+                    `;
+                    document.body.appendChild(notification);
+                    
+                    // Auto-dismiss notification after 3 seconds
+                    setTimeout(() => {
+                        notification.style.opacity = '0';
+                        notification.style.transition = 'opacity 0.5s';
+                        setTimeout(() => notification.remove(), 500);
+                    }, 3000);
+                    
+                    // Stop the spinning animation
+                    this.classList.remove('animate-spin');
+                }, 800);
+            });
+              // Set up date selector handler
+            document.getElementById('date-selector').addEventListener('change', function() {
+                // This would typically fetch new data from the server for the selected date
+                // For demo purposes, we'll just update the last update time
+                const selectedDate = new Date(this.value);
+                document.getElementById('last-update').textContent = selectedDate.toLocaleString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                // Show date selection notification
+                const notification = document.createElement('div');
+                notification.className = 'fixed bottom-4 right-4 bg-primary-600 text-white px-4 py-2 rounded-lg shadow-lg flex items-center z-50';
+                notification.innerHTML = `
+                    <i class='bx bx-calendar-check text-xl mr-2'></i>
+                    <div>
+                        <div class="font-semibold">Date Changed</div>
+                        <div class="text-xs">Showing data for ${selectedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
+                    </div>
+                    <button class="ml-4 text-white opacity-80 hover:opacity-100" onclick="this.parentElement.remove()">
+                        <i class='bx bx-x'></i>
+                    </button>
+                `;
+                document.body.appendChild(notification);
+                
+                // Auto-dismiss after 4 seconds
+                setTimeout(() => {
+                    notification.classList.add('opacity-0', 'transition-opacity', 'duration-500');
+                    setTimeout(() => notification.remove(), 500);
+                }, 4000);
+                
+                // Simulate different data on different days
+                const dayOfMonth = selectedDate.getDate();
+                let multiplier = (dayOfMonth % 5) / 10 + 0.8; // Generate a multiplier between 0.8 and 1.3
+                
+                // Update city stats with the multiplier
+                const avgCongestion = Math.round(32 * multiplier);
+                const avgSpeed = Math.round(27 / multiplier);
+                const travelIndex = (1.4 * multiplier).toFixed(1);
+                
+                // Animate the stats update
+                animateValue('avg-congestion', parseInt(document.getElementById('avg-congestion').textContent), avgCongestion, 1000, '%');
+                animateValue('avg-speed', parseInt(document.getElementById('avg-speed').textContent), avgSpeed, 1000, '');
+                animateValue('travel-index', parseFloat(document.getElementById('travel-index').textContent), parseFloat(travelIndex), 1000, 'x');
+            });
+            
+            // Animation function for stat updates
+            function animateValue(elementId, start, end, duration, suffix = '') {
+                const obj = document.getElementById(elementId);
+                if (!obj) return;
+                
+                const range = end - start;
+                const minTimer = 50;
+                const stepTime = Math.abs(Math.floor(duration / range));
+                const startTime = new Date().getTime();
+                const endTime = startTime + duration;
+                let timer;
+                
+                function run() {
+                    const now = new Date().getTime();
+                    const remaining = Math.max((endTime - now) / duration, 0);
+                    const value = Math.round(end - (remaining * range));
+                    
+                    if (suffix === 'x') {
+                        obj.textContent = `${value.toFixed(1)}${suffix}`;
+                    } else {
+                        obj.textContent = `${value}${suffix}`;
+                    }
+                    
+                    if (value === end) {
+                        clearInterval(timer);
+                    }
+                }
+                
+                timer = setInterval(run, stepTime);
+                run();
+            }
+            
+            // Simulate real-time updates
+            setInterval(function() {
+                if (document.getElementById('time-selector').value === 'current') {
+                    simulateTrafficUpdate();
+                }
+            }, 5000);
+           function simulateTrafficUpdate() {
+            const zoneIndex = Math.floor(Math.random() * cityZones.length);
+            const zone = cityZones[zoneIndex];
+            
+            // Store previous values for animation
+            const previousTrafficLevel = zone.trafficLevel;
+            
+            const trafficLevels = ['low', 'moderate', 'heavy', 'severe'];
+            const currentLevelIndex = trafficLevels.indexOf(zone.trafficLevel);
+            
+            let newLevelIndex = currentLevelIndex;
+            const chance = Math.random();
+            
+            if (chance < 0.15 && currentLevelIndex > 0) {
+                newLevelIndex--;
+            } else if (chance > 0.85 && currentLevelIndex < trafficLevels.length - 1) {
+                newLevelIndex++;
+            }
+            
+            zone.trafficLevel = trafficLevels[newLevelIndex];
+            
+            switch(zone.trafficLevel) {
+                case 'low':
+                    zone.avgSpeed = 35 + Math.floor(Math.random() * 6);
+                    zone.travelTime = 7 + Math.floor(Math.random() * 4);
+                    break;
+                case 'moderate':
+                    zone.avgSpeed = 25 + Math.floor(Math.random() * 6);
+                    zone.travelTime = 12 + Math.floor(Math.random() * 4);
+                    break;
+                case 'heavy':
+                    zone.avgSpeed = 15 + Math.floor(Math.random() * 6);
+                    zone.travelTime = 18 + Math.floor(Math.random() * 4);
+                    break;
+                case 'severe':
+                    zone.avgSpeed = 5 + Math.floor(Math.random() * 8);
+                    zone.travelTime = 25 + Math.floor(Math.random() * 6);
+                    break;
+            }
+            
+            // Update timeBasedData for 'current'
+            timeBasedData.current[zone.id] = {
+                trafficLevel: zone.trafficLevel,
+                avgSpeed: zone.avgSpeed,
+                travelTime: zone.travelTime
+            };
+            
+            // Update the map if in traffic view
+            const activeButton = document.querySelector('#traffic-btn, #accidents-btn, #travel-time-btn.bg-blue-500');
+            if (activeButton) {
+                if (activeButton.id === 'traffic-btn') {
+                    const zoneElement = document.getElementById(zone.id);
+                    
+                    // Add a visual effect for the update
+                    if (previousTrafficLevel !== zone.trafficLevel) {
+                        // Flash effect
+                        zoneElement.classList.add('transition-all', 'duration-300');
+                        zoneElement.style.transform = 'scale(1.1)';
+                        zoneElement.style.boxShadow = '0 0 15px rgba(255, 255, 255, 0.8)';
+                        
+                        setTimeout(() => {
+                            setZoneTrafficColor(zoneElement, zone.trafficLevel);
+                            
+                            setTimeout(() => {
+                                zoneElement.style.transform = '';
+                                zoneElement.style.boxShadow = '';
+                            }, 300);
+                        }, 300);
+                    } else {
+                        setZoneTrafficColor(zoneElement, zone.trafficLevel);
+                    }
+                } else if (activeButton.id === 'travel-time-btn') {
+                    showTravelTimes();
+                }
+            }
+            
+            // Update city stats
+            updateCityStats('current');
+            
+            // Update last update time
+            const now = new Date();
+            const formattedTime = now.toLocaleString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            document.getElementById('last-update').textContent = formattedTime;
+            
+            // Show a subtle notification for traffic changes if significant
+            if (previousTrafficLevel !== zone.trafficLevel && (zone.trafficLevel === 'severe' || zone.trafficLevel === 'low')) {
+                const statusColor = zone.trafficLevel === 'severe' ? 'bg-red-500' : 'bg-green-500';
+                const statusMessage = zone.trafficLevel === 'severe' ? 'Traffic Worsening' : 'Traffic Improving';
+                
+                const notification = document.createElement('div');
+                notification.className = `fixed bottom-4 left-4 ${statusColor} text-white px-4 py-2 rounded-lg shadow-lg flex items-center z-50 animate-fadeIn`;
+                notification.style.animation = 'fadeIn 0.5s ease-in-out';
+                notification.innerHTML = `
+                    <i class='bx bx-${zone.trafficLevel === 'severe' ? 'error-alt' : 'check-circle'} text-xl mr-2'></i>
+                    <div>
+                        <div class="font-semibold">${statusMessage}</div>
+                        <div class="text-xs">${zone.name} is now ${zone.trafficLevel}</div>
+                    </div>
+                `;
+                document.body.appendChild(notification);
+                
+                // Auto-dismiss after 3 seconds
+                setTimeout(() => {
+                    notification.style.animation = 'fadeOut 0.5s ease-in-out';
+                    setTimeout(() => notification.remove(), 500);
+                }, 3000);
+            }
+        }
+        
+        // Add animation styles
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            
+            @keyframes fadeOut {
+                from { opacity: 1; transform: translateY(0); }
+                to { opacity: 0; transform: translateY(10px); }
+            }        `;
+        document.head.appendChild(style);
+        
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const exportDataBtn = document.getElementById('export-data-btn');
+            if (exportDataBtn) {
+                exportDataBtn.addEventListener('click', function() {
+                    exportTrafficData();
+                });
+            }
+            
+            function exportTrafficData() {
+                const timePeriod = document.getElementById('time-selector').value;
+                const data = timeBasedData[timePeriod];
+                const exportData = [];
+                for (const zoneId in data) {
+                    if (data.hasOwnProperty(zoneId)) {
+                        const zone = cityZones.find(z => z.id === zoneId);
+                        if (zone) {
+                            exportData.push({
+                                zone: zone.name,
+                                trafficLevel: data[zoneId].trafficLevel,
+                                averageSpeed: data[zoneId].avgSpeed,
+                                travelTime: data[zoneId].travelTime,
+                                accidents: zone.accidents,
+                                timestamp: new Date().toISOString()
+                            });
+                        }
+                    }
+                }
+                
+                let csvContent = "data:text/csv;charset=utf-8,";
+                csvContent += "Zone,Traffic Level,Average Speed,Travel Time (min),Accidents,Timestamp\n";
+                
+                exportData.forEach(item => {
+                    csvContent += `"${item.zone}","${item.trafficLevel}",${item.averageSpeed},${item.travelTime},${item.accidents},"${item.timestamp}"\n`;
+                });
+                
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", `traffic_data_${timePeriod}_${new Date().toISOString().split('T')[0]}.csv`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                const notification = document.createElement('div');
+                notification.className = 'fixed bottom-4 right-4 bg-primary-600 text-white px-4 py-2 rounded-lg shadow-lg flex items-center z-50';
+                notification.innerHTML = `
+                    <i class='bx bx-download text-xl mr-2'></i>
+                    <div>
+                        <div class="font-semibold">Export Complete</div>
+                        <div class="text-xs">Traffic data has been downloaded</div>
+                    </div>
+                `;
+                document.body.appendChild(notification);
+                setTimeout(() => {
+                    notification.style.animation = 'fadeOut 0.5s ease-in-out';
+                    setTimeout(() => notification.remove(), 500);
+                }, 3000);
+            }
+            
+            const historicalTab = document.getElementById('historical-tab');
+            if (historicalTab) {
+                const printBtnContainer = document.createElement('div');
+                printBtnContainer.className = 'flex justify-end mb-4';
+                printBtnContainer.innerHTML = `
+                    <button id="print-report-btn" class="btn btn-secondary flex items-center">
+                        <i class='bx bx-printer mr-2'></i>
+                        Print Report
+                    </button>
+                `;
+                historicalTab.insertBefore(printBtnContainer, historicalTab.firstChild);
+                document.getElementById('print-report-btn').addEventListener('click', function() {
+                    const printHeader = document.createElement('div');
+                    printHeader.className = 'print-header hidden';
+                    printHeader.innerHTML = `
+                        <h1 class="text-2xl font-bold">Urban Traffic Management - Historical Report</h1>
+                        <p class="text-gray-500">Generated on ${new Date().toLocaleDateString('en-US', { 
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric' 
+                        })}</p>
+                    `;
+                    
+                    const printFooter = document.createElement('div');
+                    printFooter.className = 'print-footer hidden';
+                    printFooter.innerHTML = `
+                        <p>© ${new Date().getFullYear()} Urban Planning Department</p>
+                    `;
+                    
+                    document.body.insertBefore(printHeader, document.body.firstChild);
+                    document.body.appendChild(printFooter);
+                    
+                    document.querySelectorAll('.gradient-bg, .tab-navigation').forEach(el => {
+                        el.classList.add('no-print');
+                    });
+                    setTimeout(() => {
+                        printHeader.classList.remove('hidden');
+                        printFooter.classList.remove('hidden');
+                        window.print();
+                        
+                        setTimeout(() => {
+                            printHeader.remove();
+                            printFooter.remove();
+                            document.querySelectorAll('.no-print').forEach(el => {
+                                el.classList.remove('no-print');
+                            });
+                        }, 1000);
+                    }, 300);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

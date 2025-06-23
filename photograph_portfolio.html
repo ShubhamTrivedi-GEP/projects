@@ -4,10 +4,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Emma Wilson Photography</title>
     <meta name="description" content="Emma Wilson Photography - Professional photographer specializing in nature, portrait, architecture and travel photography.">
-    <!-- Image licensing -->
     <link rel="license" href="https://unsplash.com/license">
     <meta name="image-source" content="Unsplash">
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -31,10 +29,81 @@
       }
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">    <style>
-        /* Base font settings */
         body {
             font-family: 'Montserrat', sans-serif;
             letter-spacing: 0.01em;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes slideInLeft {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .animate-fadeIn {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        
+        .animate-fadeOut {
+            animation: fadeOut 0.3s ease-out forwards;
+        }
+        
+        .animate-slideInRight {
+            animation: slideInRight 0.3s ease-out forwards;
+        }
+        
+        .animate-slideInLeft {
+            animation: slideInLeft 0.3s ease-out forwards;
+        }
+          .animate-pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        .fullscreen-slider {
+            backdrop-filter: blur(5px);
+            transition: opacity 0.3s ease;
+        }
+        
+        .thumbnail {
+            transition: all 0.2s ease-in-out;
+        }
+        
+        .thumbnail:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+        
+        .thumbnail.border-accent {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(140, 120, 81, 0.3);
+        }
+        
+        #slider-content img {
+            transition: transform 0.3s ease;
+        }
+        
+        #slider-content:hover img {
+            transform: scale(1.02);
         }
         h1, h2, h3, h4, h5, h6 {
             font-family: 'Cormorant Garamond', serif;
@@ -42,7 +111,6 @@
             letter-spacing: 0.02em;
         }
         
-        /* Custom styles that extend Tailwind */
         .transition-opacity {
             transition: opacity 0.5s ease-in-out;
         }
@@ -103,7 +171,6 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
-        /* Form styling */
         input, textarea {
             transition: all 0.3s ease;
         }
@@ -112,7 +179,6 @@
             box-shadow: 0 0 0 3px rgba(140, 120, 81, 0.2);
         }
         
-        /* Loading animation for lazy-loaded images */
         .lazy-image {
             opacity: 0;
             transition: opacity 0.3s ease-in-out;
@@ -131,7 +197,6 @@
             }
         }
         
-        /* Scrollbar styling */
         ::-webkit-scrollbar {
             width: 6px;
         }
@@ -145,7 +210,6 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #6d5d3d;
         }
-          /* Skip to content link for accessibility */
         .skip-link {
             position: absolute;
             top: -40px;
@@ -160,7 +224,6 @@
             top: 0;
         }
         
-        /* Custom underline animation for nav links */
         .nav-link {
             position: relative;
         }
@@ -178,7 +241,6 @@
             width: 100%;
         }
         
-        /* Animations */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -189,10 +251,8 @@
     </style>
 </head>
 <body class="bg-light font-sans text-dark">
-    <!-- Skip to content link for accessibility -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
-    <!-- Navbar -->
     <nav class="fixed top-0 w-full bg-white bg-opacity-95 z-40 shadow-sm">
         <div class="container mx-auto px-4 py-5 flex justify-between items-center">
             <a href="#" class="text-3xl font-serif tracking-wide font-light">Emma Wilson <span class="text-accent">Photography</span></a>
@@ -205,7 +265,6 @@
                 <i class="fas fa-bars text-xl"></i>
             </button>
         </div>
-        <!-- Mobile menu -->
         <div id="mobile-menu" class="hidden md:hidden bg-white w-full absolute shadow-lg" role="menu" aria-labelledby="mobile-menu-button">
             <div class="container mx-auto px-4 py-2 flex flex-col space-y-3">
                 <a href="#home" class="block py-2 hover:bg-gray-100 transition-colors" role="menuitem">Home</a>
@@ -214,8 +273,8 @@
                 <a href="#contact" class="block py-2 hover:bg-gray-100 transition-colors" role="menuitem">Contact</a>
             </div>
         </div>
-    </nav>    <!-- Hero Section -->
-    <section id="home" class="h-screen flex items-center justify-center bg-cover bg-center relative" style="background-image: url('https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=1920&h=1080&auto=format&fit=crop&q=80');">
+    </nav>
+    <section id="home" class="h-screen flex items-center justify-center bg-cover bg-center relative" style="background-image: url('https://images.unsplash.com/photo-1740139829004-c14cba0b8723?q=80&w=1984&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');">
         <div class="absolute inset-0 bg-black bg-opacity-50"></div>
         <div id="main-content" class="relative z-10 text-center text-white px-4">
             <p class="text-sm uppercase tracking-[0.3em] mb-4 font-sans">Fine Art Photography</p>
@@ -225,12 +284,11 @@
         </div>
     </section>
 
-    <!-- Gallery Section -->    <section id="gallery" class="py-24 bg-white">
+    <section id="gallery" class="py-24 bg-white">
         <div class="container mx-auto px-4">
             <h2 class="section-heading text-3xl md:text-5xl font-serif mb-6 text-center">Portfolio Gallery</h2>
             <p class="text-gray-600 text-center mb-16 max-w-2xl mx-auto font-light">Explore my curated collection of photography across various genres.</p>
             
-            <!-- Gallery Filter Navigation -->
             <div class="flex justify-center mb-16 flex-wrap">
                 <button class="gallery-filter-btn active px-5 py-2 mx-3 my-1 text-sm uppercase tracking-wider border-b-2 border-accent font-medium text-dark" data-category="all">All Work</button>
                 <button class="gallery-filter-btn px-5 py-2 mx-3 my-1 text-sm uppercase tracking-wider border-b-2 border-transparent hover:border-accent-light transition-colors font-medium text-gray-600 hover:text-dark" data-category="nature">Nature</button>
@@ -239,8 +297,7 @@
                 <button class="gallery-filter-btn px-5 py-2 mx-3 my-1 text-sm uppercase tracking-wider border-b-2 border-transparent hover:border-accent-light transition-colors font-medium text-gray-600 hover:text-dark" data-category="travel">Travel</button>
             </div>
             
-            <!-- Gallery Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">                <!-- Nature Images -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 <div class="gallery-item category-nature cursor-pointer overflow-hidden rounded-lg shadow-md">
                     <img data-src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&auto=format&fit=crop&q=80" class="lazy-image w-full h-64 object-cover" alt="Mountain vista with fog">
                     <div class="p-4 bg-white">
@@ -256,7 +313,6 @@
                     </div>
                 </div>
                 
-                <!-- Portrait Images -->
                 <div class="gallery-item category-portrait cursor-pointer overflow-hidden rounded-lg shadow-md">
                     <img data-src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=800&h=600&auto=format&fit=crop&q=80" class="lazy-image w-full h-64 object-cover" alt="Woman portrait in city">
                     <div class="p-4 bg-white">
@@ -272,7 +328,6 @@
                     </div>
                 </div>
                 
-                <!-- Architecture Images -->
                 <div class="gallery-item category-architecture cursor-pointer overflow-hidden rounded-lg shadow-md">
                     <img data-src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&h=600&auto=format&fit=crop&q=80" class="lazy-image w-full h-64 object-cover" alt="Modern glass building">
                     <div class="p-4 bg-white">
@@ -288,7 +343,6 @@
                     </div>
                 </div>
                 
-                <!-- Travel Images -->
                 <div class="gallery-item category-travel cursor-pointer overflow-hidden rounded-lg shadow-md">
                     <img data-src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&h=600&auto=format&fit=crop&q=80" class="lazy-image w-full h-64 object-cover" alt="Tropical beach">
                     <div class="p-4 bg-white">
@@ -304,7 +358,6 @@
                     </div>
                 </div>
                 
-                <!-- More Nature Images -->
                 <div class="gallery-item category-nature cursor-pointer overflow-hidden rounded-lg shadow-md">
                     <img data-src="https://images.unsplash.com/photo-1473580044384-7ba9967e16a0?w=800&h=600&auto=format&fit=crop&q=80" class="lazy-image w-full h-64 object-cover" alt="Desert landscape at dawn">
                     <div class="p-4 bg-white">
@@ -316,7 +369,7 @@
         </div>
     </section>
 
-    <!-- About Section -->    <section id="about" class="py-24 bg-gray-50">
+  <section id="about" class="py-24 bg-gray-50">
         <div class="container mx-auto px-4">
             <div class="flex flex-col md:flex-row items-center gap-16">
                 <div class="md:w-1/2">
@@ -347,7 +400,7 @@
         </div>
     </section>
 
-    <!-- Contact Section -->    <section id="contact" class="py-24 bg-white">
+   <section id="contact" class="py-24 bg-white">
         <div class="container mx-auto px-4">
             <h2 class="section-heading text-3xl md:text-5xl font-serif mb-6 text-center">Get In Touch</h2>
             <p class="text-gray-600 text-center mb-16 max-w-2xl mx-auto font-light leading-relaxed">Interested in working together? Fill out the form below and I'll get back to you soon.</p>
@@ -425,7 +478,7 @@
                 </div>
             </div>
         </div>
-    </section>    <!-- Footer -->
+    </section>
     <footer class="bg-dark text-white py-16">
         <div class="container mx-auto px-4">
             <div class="flex flex-col md:flex-row justify-between items-center">
@@ -460,25 +513,64 @@
         </div>
     </footer>
 
-    <!-- Fullscreen Slider -->
-    <div id="fullscreen-slider" class="fullscreen-slider fixed inset-0 hidden flex items-center justify-center">
-        <button id="close-slider" class="absolute top-6 right-6 text-white text-3xl z-50 hover:text-gray-300 transition-colors">
-            <i class="fas fa-times"></i>
-        </button>
-        <button id="prev-slide" class="absolute left-6 text-white text-5xl z-50 hover:text-gray-300 transition-colors">
-            <i class="fas fa-chevron-left"></i>
-        </button>
-        <button id="next-slide" class="absolute right-6 text-white text-5xl z-50 hover:text-gray-300 transition-colors">
-            <i class="fas fa-chevron-right"></i>
-        </button>
-        <div id="slider-content" class="w-full h-full flex items-center justify-center">
-            <!-- Slides will be added here dynamically -->
+    <div id="fullscreen-slider" class="fullscreen-slider fixed inset-0 hidden z-50 bg-black bg-opacity-95" role="dialog" aria-modal="true" aria-labelledby="gallery-title">
+        <div class="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-black to-transparent flex items-center justify-between px-6 z-50">
+            <h4 id="gallery-title" class="text-white font-serif text-xl opacity-80">Photo Gallery</h4>
+            <button id="close-slider" class="text-white text-2xl hover:text-accent focus:outline-none focus:ring-2 focus:ring-accent rounded-full p-2 transition-all" aria-label="Close gallery">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
-        <div id="slide-counter" class="absolute bottom-6 text-white text-sm"></div>
+        
+        <div class="absolute inset-0 flex items-center justify-center">
+            <button id="prev-slide" class="absolute left-4 md:left-8 text-white text-4xl z-40 hover:text-accent focus:outline-none focus:ring-2 focus:ring-accent rounded-full p-2 transition-all transform hover:scale-110" aria-label="Previous image">
+                <i class="fas fa-chevron-left"></i>
+                <span class="sr-only">Previous image</span>
+            </button>
+            
+            <div id="slider-content" class="w-full h-full flex items-center justify-center" role="region" aria-live="polite">
+                <!-- Slides will be added here dynamically -->
+            </div>
+            
+            <button id="next-slide" class="absolute right-4 md:right-8 text-white text-4xl z-40 hover:text-accent focus:outline-none focus:ring-2 focus:ring-accent rounded-full p-2 transition-all transform hover:scale-110" aria-label="Next image">
+                <i class="fas fa-chevron-right"></i>
+                <span class="sr-only">Next image</span>
+            </button>
+        </div>
+        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent">
+            <div id="slide-info" class="px-6 py-3 text-white">
+                <h3 class="text-xl font-medium slide-title"></h3>
+                <p class="text-sm text-gray-300 slide-category"></p>
+            </div>
+            
+            <div class="px-6 pb-4 flex items-center justify-between">
+                <div class="flex items-center">
+                    <div id="slide-counter" class="text-white text-sm"></div>
+                    <div class="hidden md:flex ml-6 text-gray-400 text-xs">
+                        <span class="mr-3"><kbd class="px-2 py-1 bg-gray-800 rounded">←</kbd> Previous</span>
+                        <span class="mr-3"><kbd class="px-2 py-1 bg-gray-800 rounded">→</kbd> Next</span>
+                        <span class="mr-3"><kbd class="px-2 py-1 bg-gray-800 rounded">Space</kbd> Play/Pause</span>
+                        <span><kbd class="px-2 py-1 bg-gray-800 rounded">Esc</kbd> Close</span>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button id="autoplay-button" class="text-white hover:text-accent focus:outline-none focus:ring-2 focus:ring-accent rounded p-2 transition-all" aria-label="Play slideshow">
+                        <i class="fas fa-play"></i>
+                    </button>
+                    <button id="fullscreen-button" class="text-white hover:text-accent focus:outline-none focus:ring-2 focus:ring-accent rounded p-2 transition-all" aria-label="Toggle fullscreen">
+                        <i class="fas fa-expand"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div id="thumbnails-container" class="overflow-x-auto pb-4 px-4">
+                <div id="thumbnails-track" class="flex gap-2 transition-transform duration-300 ease-out">
+                    <!-- Thumbnails will be added here dynamically -->
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- JavaScript -->
-    <script>        // Mobile menu toggle
+    <script> 
         const mobileMenuButton = document.getElementById('mobile-menu-button');
         const mobileMenu = document.getElementById('mobile-menu');
         
@@ -488,7 +580,6 @@
             mobileMenuButton.setAttribute('aria-expanded', !isExpanded);
         });
 
-        // Smooth scrolling for navigation links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -497,18 +588,15 @@
                     behavior: 'smooth'
                 });
                 
-                // Close mobile menu if open
                 if (!mobileMenu.classList.contains('hidden')) {
                     mobileMenu.classList.add('hidden');
                 }
             });
         });
 
-        // Lazy loading implementation
         document.addEventListener("DOMContentLoaded", function() {
             let lazyImages = [].slice.call(document.querySelectorAll(".lazy-image"));
             
-            // Add placeholder animation to each image container
             lazyImages.forEach(function(lazyImage) {
                 lazyImage.classList.add('image-placeholder');
             });
@@ -532,7 +620,6 @@
                     lazyImageObserver.observe(lazyImage);
                 });
             } else {
-                // Fallback for browsers that don't support IntersectionObserver
                 let active = false;
                 
                 const lazyLoad = function() {
@@ -572,25 +659,21 @@
             }
         });
 
-        // Gallery filtering
         document.addEventListener('DOMContentLoaded', function() {
             const filterButtons = document.querySelectorAll('.gallery-filter-btn');
             const galleryItems = document.querySelectorAll('.gallery-item');
               filterButtons.forEach(button => {
                 button.addEventListener('click', () => {
-                    // Remove active class from all buttons
                     filterButtons.forEach(btn => {
                         btn.classList.remove('active', 'border-accent', 'text-dark');
                         btn.classList.add('border-transparent', 'text-gray-600');
                     });
                     
-                    // Add active class to clicked button
                     button.classList.add('active', 'border-accent', 'text-dark');
                     button.classList.remove('border-transparent', 'text-gray-600');
                     
                     const category = button.getAttribute('data-category');
                     
-                    // Filter gallery items
                     galleryItems.forEach(item => {
                         if (category === 'all' || item.classList.contains(`category-${category}`)) {
                             item.style.display = 'block';
@@ -600,9 +683,7 @@
                     });
                 });
             });
-        });
-
-        // Fullscreen slider functionality
+        });      
         document.addEventListener('DOMContentLoaded', function() {
             const fullscreenSlider = document.getElementById('fullscreen-slider');
             const sliderContent = document.getElementById('slider-content');
@@ -610,98 +691,445 @@
             const prevSlide = document.getElementById('prev-slide');
             const nextSlide = document.getElementById('next-slide');
             const slideCounter = document.getElementById('slide-counter');
+            const thumbnailsTrack = document.getElementById('thumbnails-track');
+            const autoplayButton = document.getElementById('autoplay-button');
+            const fullscreenButton = document.getElementById('fullscreen-button');
+            const slideTitle = document.querySelector('.slide-title');
+            const slideCategory = document.querySelector('.slide-category');
             const galleryItems = document.querySelectorAll('.gallery-item');
             
             let currentSlideIndex = 0;
             let slides = [];
-              // Populate slides array with gallery images
+            let isAutoPlaying = false;
+            let autoplayTimer = null;
+            let touchStartX = 0;
+            let touchEndX = 0;
+            
             galleryItems.forEach(item => {
                 const image = item.querySelector('img');
                 const title = item.querySelector('h3').textContent;
                 const category = item.querySelector('p').textContent;
                 
-                // Get the image source and convert to high-resolution for the slider
                 let imageSrc = image.dataset.src || image.src;
-                // Replace Unsplash image parameters for higher resolution in fullscreen
                 if (imageSrc.includes('unsplash.com')) {
                     imageSrc = imageSrc.replace(/w=\d+&h=\d+&/, 'w=1600&h=1200&');
                 }
                 
+                let thumbnailSrc = imageSrc;
+                if (thumbnailSrc.includes('unsplash.com')) {
+                    thumbnailSrc = thumbnailSrc.replace(/w=\d+&h=\d+&/, 'w=200&h=150&');
+                }
+                
                 slides.push({
                     src: imageSrc,
+                    thumbnail: thumbnailSrc,
                     title: title,
                     category: category
                 });
             });
             
-            // Open slider when clicking on a gallery item
+            slides.forEach((slide, index) => {
+                const thumbnailElement = document.createElement('div');
+                thumbnailElement.classList.add('thumbnail', 'min-w-[100px]', 'h-16', 'cursor-pointer', 'rounded', 'overflow-hidden', 'border-2');
+                
+                if (index === 0) {
+                    thumbnailElement.classList.add('border-accent');
+                } else {
+                    thumbnailElement.classList.add('border-transparent');
+                }
+                  thumbnailElement.innerHTML = `
+                    <img src="${slide.thumbnail}" alt="${slide.title}" class="w-full h-full object-cover" loading="lazy">
+                `;
+                
+                thumbnailElement.addEventListener('click', () => {
+                    goToSlide(index);
+                });
+                
+                thumbnailsTrack.appendChild(thumbnailElement);
+            });
+            
             galleryItems.forEach((item, index) => {
                 item.addEventListener('click', () => {
                     openSlider(index);
                 });
             });
             
-            // Close slider
             closeSlider.addEventListener('click', () => {
-                fullscreenSlider.classList.add('hidden');
-                document.body.style.overflow = 'auto';
+                closeFullscreenSlider();
             });
             
-            // Navigate to previous slide
             prevSlide.addEventListener('click', () => {
                 navigateSlider(-1);
             });
             
-            // Navigate to next slide
             nextSlide.addEventListener('click', () => {
                 navigateSlider(1);
             });
             
-            // Handle keyboard navigation
+            autoplayButton.addEventListener('click', () => {
+                toggleAutoplay();
+            });
+            
+            fullscreenButton.addEventListener('click', () => {
+                toggleFullscreen();
+            });
+            
             document.addEventListener('keydown', (e) => {
                 if (!fullscreenSlider.classList.contains('hidden')) {
                     if (e.key === 'Escape') {
-                        fullscreenSlider.classList.add('hidden');
-                        document.body.style.overflow = 'auto';
+                        closeFullscreenSlider();
                     } else if (e.key === 'ArrowLeft') {
                         navigateSlider(-1);
                     } else if (e.key === 'ArrowRight') {
                         navigateSlider(1);
+                    } else if (e.key === ' ') {
+                        toggleAutoplay();
+                        e.preventDefault();
+                    } else if (e.key === 'f') {
+                        toggleFullscreen();
                     }
                 }
             });
+            let touchStartY = 0;
+            let touchMoveX = 0;
+            let touchMoveY = 0;
+            let swipeDirection = null;
+            let swipeThreshold = 50;
+            let swipeDirectionLocked = false;
             
-            // Open slider with specific slide
+            sliderContent.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+                touchStartY = e.changedTouches[0].screenY;
+                touchMoveX = touchStartX;
+                touchMoveY = touchStartY;
+                swipeDirection = null;
+                swipeDirectionLocked = false;
+            });
+            
+            sliderContent.addEventListener('touchmove', (e) => {
+                touchMoveX = e.changedTouches[0].screenX;
+                touchMoveY = e.changedTouches[0].screenY;
+                
+                if (!swipeDirectionLocked) {
+                    const diffX = Math.abs(touchMoveX - touchStartX);
+                    const diffY = Math.abs(touchMoveY - touchStartY);
+                    
+                    if (diffX > 10 || diffY > 10) {
+                        swipeDirection = diffX > diffY ? 'horizontal' : 'vertical';
+                        swipeDirectionLocked = true;
+                    }
+                }
+                
+                if (swipeDirection === 'horizontal') {
+                    e.preventDefault();
+                    
+                    const currentImg = sliderContent.querySelector('img');
+                    if (currentImg) {
+                        const movePercent = (touchMoveX - touchStartX) / window.innerWidth * 20;
+                        currentImg.style.transform = `translateX(${movePercent}px)`;
+                        currentImg.style.opacity = 1 - (Math.abs(movePercent) / 100);
+                    }
+                }
+            }, { passive: false });
+            
+            sliderContent.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                
+                const currentImg = sliderContent.querySelector('img');
+                if (currentImg) {
+                    currentImg.style.transform = '';
+                    currentImg.style.opacity = '';
+                }
+                
+                if (swipeDirection === 'horizontal') {
+                    handleSwipe();
+                }
+            });
+            
+            function handleSwipe() {
+                const swipeThreshold = 50;
+                if (touchEndX - touchStartX > swipeThreshold) {
+                    navigateSlider(-1);
+                } else if (touchStartX - touchEndX > swipeThreshold) {
+                    navigateSlider(1);
+                }
+            }
+            
             function openSlider(index) {
                 currentSlideIndex = index;
                 updateSlider();
+                
                 fullscreenSlider.classList.remove('hidden');
+                fullscreenSlider.classList.add('animate-fadeIn');
+                
                 document.body.style.overflow = 'hidden';
+                
+                scrollThumbnailIntoView();
             }
             
-            // Navigate through slides
+            function closeFullscreenSlider() {
+                stopAutoplay();
+                
+                fullscreenSlider.classList.add('animate-fadeOut');
+                
+                setTimeout(() => {
+                    fullscreenSlider.classList.remove('animate-fadeIn', 'animate-fadeOut');
+                    fullscreenSlider.classList.add('hidden');
+                    document.body.style.overflow = 'auto';
+                    
+                    if (document.fullscreenElement) {
+                        document.exitFullscreen();
+                    }
+                }, 300);
+            }
+            
             function navigateSlider(direction) {
                 currentSlideIndex = (currentSlideIndex + direction + slides.length) % slides.length;
                 updateSlider();
             }
             
-            // Update slider content
+            function goToSlide(index) {
+                currentSlideIndex = index;
+                updateSlider();
+            }
+            
+            function toggleAutoplay() {
+                isAutoPlaying = !isAutoPlaying;
+                
+                if (isAutoPlaying) {
+                    startAutoplay();
+                    autoplayButton.innerHTML = '<i class="fas fa-pause"></i>';
+                    autoplayButton.setAttribute('aria-label', 'Pause slideshow');
+                } else {
+                    stopAutoplay();
+                    autoplayButton.innerHTML = '<i class="fas fa-play"></i>';
+                    autoplayButton.setAttribute('aria-label', 'Play slideshow');
+                }
+            }
+            
+            function startAutoplay() {
+                autoplayTimer = setInterval(() => {
+                    navigateSlider(1);
+                }, 3000);
+            }
+            
+            function stopAutoplay() {
+                clearInterval(autoplayTimer);
+            }
+            function toggleFullscreen() {
+                const doc = window.document;
+                const docEl = fullscreenSlider;
+                
+                const requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen ||
+                                         docEl.webkitRequestFullscreen || docEl.msRequestFullscreen;
+                const cancelFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen ||
+                                        doc.webkitExitFullscreen || doc.msExitFullscreen;
+                
+                const isFullscreen = doc.fullscreenElement || doc.mozFullScreenElement ||
+                                    doc.webkitFullscreenElement || doc.msFullscreenElement;
+                
+                if (!isFullscreen) {
+                    if (requestFullScreen) {
+                        requestFullScreen.call(docEl).catch(err => {
+                            const message = document.createElement('div');
+                            message.className = 'absolute bottom-20 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 text-white px-4 py-2 rounded text-sm';
+                            message.textContent = 'Fullscreen request was denied';
+                            message.style.zIndex = '9999';
+                            fullscreenSlider.appendChild(message);
+                            
+                            setTimeout(() => {
+                                if (message.parentNode === fullscreenSlider) {
+                                    fullscreenSlider.removeChild(message);
+                                }
+                            }, 3000);
+                            
+                            console.error(`Error attempting to enable fullscreen: ${err.message}`);
+                        });
+                    }
+                    fullscreenButton.innerHTML = '<i class="fas fa-compress"></i>';
+                    fullscreenButton.setAttribute('aria-label', 'Exit fullscreen');
+                } else {
+                    if (cancelFullScreen) {
+                        cancelFullScreen.call(doc);
+                    }
+                    fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
+                    fullscreenButton.setAttribute('aria-label', 'Enter fullscreen');
+                }
+            }
+            
+            function scrollThumbnailIntoView() {
+                const thumbnails = thumbnailsTrack.querySelectorAll('.thumbnail');
+                const currentThumbnail = thumbnails[currentSlideIndex];
+                
+                if (currentThumbnail) {
+                    const containerWidth = thumbnailsTrack.parentElement.offsetWidth;
+                    const thumbnailWidth = currentThumbnail.offsetWidth;
+                    const scrollPosition = currentThumbnail.offsetLeft - (containerWidth / 2) + (thumbnailWidth / 2);
+                    
+                    thumbnailsTrack.parentElement.scrollLeft = scrollPosition;
+                }
+            }
             function updateSlider() {
                 const slide = slides[currentSlideIndex];
                 
-                sliderContent.innerHTML = `
-                    <div class="text-center">
-                        <img src="${slide.src}" alt="${slide.title}" class="max-h-screen max-w-full object-contain">
-                        <div class="mt-4 text-white">
-                            <h3 class="text-2xl font-semibold">${slide.title}</h3>
-                            <p class="text-gray-300">${slide.category}</p>
-                        </div>
-                    </div>
-                `;
+                preloadAdjacentImages();
+                
+                const tempContainer = document.createElement('div');
+                tempContainer.classList.add('w-full', 'h-full', 'flex', 'items-center', 'justify-center', 'opacity-0', 'transition-opacity', 'duration-300');
+                const img = document.createElement('img');
+                img.src = slide.src;
+                img.alt = slide.title;
+                img.className = "max-h-[85vh] max-w-[90vw] object-contain shadow-2xl transition-all duration-300";
+                img.loading = "eager";
+                img.setAttribute('data-zoomed', 'false');
+                
+                const loadingSpinner = document.createElement('div');
+                loadingSpinner.className = "absolute flex items-center justify-center";
+                loadingSpinner.innerHTML = '<div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent"></div>';
+                tempContainer.appendChild(loadingSpinner);
+                
+                img.addEventListener('dblclick', function(e) {
+                    const isZoomed = img.getAttribute('data-zoomed') === 'true';
+                    
+                    if (isZoomed) {
+                        img.style.maxHeight = '85vh';
+                        img.style.maxWidth = '90vw';
+                        img.style.objectFit = 'contain';
+                        img.style.cursor = 'zoom-in';
+                        img.setAttribute('data-zoomed', 'false');
+                    } else {
+                        img.style.maxHeight = 'none';
+                        img.style.maxWidth = 'none';
+                        img.style.objectFit = 'none';
+                        img.style.cursor = 'zoom-out';
+                        img.setAttribute('data-zoomed', 'true');
+                        const rect = img.getBoundingClientRect();
+                        const offsetX = e.clientX - rect.left;
+                        const offsetY = e.clientY - rect.top;
+                        
+                        const percentX = offsetX / rect.width;
+                        const percentY = offsetY / rect.height;
+                        
+                        tempContainer.scrollLeft = (img.offsetWidth * percentX) - (window.innerWidth / 2);
+                        tempContainer.scrollTop = (img.offsetHeight * percentY) - (window.innerHeight / 2);
+                    }
+                });
+                
+                img.addEventListener('load', function() {
+                    const zoomIndicator = document.createElement('div');
+                    zoomIndicator.className = "absolute bottom-4 right-4 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded pointer-events-none";
+                    zoomIndicator.innerHTML = 'Double-click to zoom';
+                    zoomIndicator.style.opacity = '0';
+                    
+                    tempContainer.appendChild(zoomIndicator);
+                    
+                    setTimeout(() => {
+                        zoomIndicator.style.transition = 'opacity 0.5s ease';
+                        zoomIndicator.style.opacity = '1';
+                        
+                        setTimeout(() => {
+                            zoomIndicator.style.opacity = '0';
+                            
+                            setTimeout(() => {
+                                if (zoomIndicator.parentNode === tempContainer) {
+                                    tempContainer.removeChild(zoomIndicator);
+                                }
+                            }, 500);
+                        }, 2000);
+                    }, 1000);
+                });
+                
+                img.style.cursor = 'zoom-in';
+                
+                img.onload = function() {
+                    if (loadingSpinner.parentNode === tempContainer) {
+                        tempContainer.removeChild(loadingSpinner);
+                    }
+                    img.classList.add('animate-fadeIn');
+                    
+                    const imgRatio = this.naturalWidth / this.naturalHeight;
+                    if (imgRatio > 2) { 
+                        tempContainer.classList.add('overflow-x-auto');
+                    } else if (imgRatio < 0.5) {
+                        tempContainer.classList.add('overflow-y-auto');
+                    }
+                };
+                
+                tempContainer.appendChild(img);
+                
+                const currentContent = sliderContent.querySelector('div');
+                if (currentContent) {
+                    currentContent.classList.add('opacity-0');
+                    
+                    setTimeout(() => {
+                        sliderContent.innerHTML = '';
+                        sliderContent.appendChild(tempContainer);
+                        
+                        setTimeout(() => {
+                            tempContainer.classList.remove('opacity-0');
+                        }, 50);
+                    }, 250);
+                } else {
+                    sliderContent.appendChild(tempContainer);
+                    setTimeout(() => {
+                        tempContainer.classList.remove('opacity-0');
+                    }, 50);
+                }
+                
+                function preloadAdjacentImages() {
+                    const nextIndex = (currentSlideIndex + 1) % slides.length;
+                    const prevIndex = (currentSlideIndex - 1 + slides.length) % slides.length;
+                    
+                    [nextIndex, prevIndex].forEach(idx => {
+                        const preloadImg = new Image();
+                        preloadImg.src = slides[idx].src;
+                    });
+                }
+                
+                slideTitle.textContent = slide.title;
+                slideCategory.textContent = slide.category;
                 
                 slideCounter.textContent = `${currentSlideIndex + 1} / ${slides.length}`;
+                
+                const thumbnails = thumbnailsTrack.querySelectorAll('.thumbnail');
+                thumbnails.forEach((thumbnail, index) => {
+                    if (index === currentSlideIndex) {
+                        thumbnail.classList.add('border-accent');
+                        thumbnail.classList.remove('border-transparent');
+                    } else {
+                        thumbnail.classList.remove('border-accent');
+                        thumbnail.classList.add('border-transparent');
+                    }
+                });
+                scrollThumbnailIntoView();
             }
-        });        // Contact form handling
+            
+            window.addEventListener('beforeunload', () => {
+                stopAutoplay();
+            });
+            
+            window.addEventListener('error', () => {
+                stopAutoplay();
+                document.body.style.overflow = 'auto';
+            });
+            
+            window.addEventListener('popstate', () => {
+                if (!fullscreenSlider.classList.contains('hidden')) {
+                    closeFullscreenSlider();
+                }
+            });
+            
+            function addHistoryEntry() {
+                const currentState = history.state;
+                history.pushState({...currentState, sliderOpen: true}, '');
+            }
+            
+            const originalOpenSlider = openSlider;
+            openSlider = function(index) {
+                addHistoryEntry();
+                originalOpenSlider(index);
+            };
+        });
         document.addEventListener('DOMContentLoaded', function() {
             const contactForm = document.getElementById('contact-form');
             const formStatus = document.getElementById('form-status');
@@ -709,7 +1137,6 @@
             const buttonText = document.getElementById('button-text');
             const buttonLoader = document.getElementById('button-loader');
             
-            // Real-time form validation
             const inputs = contactForm.querySelectorAll('input, textarea');
             
             inputs.forEach(input => {
@@ -728,7 +1155,6 @@
                 const errorElement = input.nextElementSibling;
                 
                 if (!input.checkValidity()) {
-                    // Create error message if it doesn't exist
                     if (!errorElement || !errorElement.classList.contains('error-message')) {
                         const error = document.createElement('p');
                         error.classList.add('error-message', 'text-red-500', 'text-sm', 'mt-1');
@@ -745,7 +1171,6 @@
                         input.classList.add('is-invalid', 'border-red-500');
                     }
                 } else {
-                    // Remove error message if input is valid
                     if (errorElement && errorElement.classList.contains('error-message')) {
                         errorElement.remove();
                         input.classList.remove('is-invalid', 'border-red-500');
@@ -754,7 +1179,6 @@
                 }
             }
             
-            // Function to set button state
             function setButtonState(isLoading) {
                 if (isLoading) {
                     submitButton.disabled = true;
@@ -772,7 +1196,6 @@
             contactForm.addEventListener('submit', function(e) {
                 e.preventDefault();
                 
-                // Validate all inputs
                 let isValid = true;
                 inputs.forEach(input => {
                     validateInput(input);
@@ -785,23 +1208,17 @@
                     return;
                 }
                 
-                // Show loading state on button
                 setButtonState(true);
                 
-                // Get form data
                 const formData = new FormData(contactForm);
                 const formDataObj = {};
                 formData.forEach((value, key) => {
                     formDataObj[key] = value;
                 });
                 
-                // Here you would typically send the data to a server
-                // For demonstration, we'll log it and show a success message
                 console.log('Form data:', formDataObj);
                 
-                // Simulate API call delay
                 setTimeout(() => {
-                    // Show success message
                     formStatus.innerHTML = `
                         <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 transition-opacity animate-fadeIn">
                             <p class="flex items-center">
@@ -814,7 +1231,6 @@
                     `;
                     formStatus.classList.remove('hidden');
                     
-                    // Reset form and input styles
                     contactForm.reset();
                     inputs.forEach(input => {
                         if (input.nextElementSibling && input.nextElementSibling.classList.contains('error-message')) {
@@ -823,10 +1239,8 @@
                         input.classList.remove('is-invalid', 'border-red-500', 'border-green-500');
                     });
                     
-                    // Reset button state
                     setButtonState(false);
                     
-                    // Hide success message after 5 seconds
                     setTimeout(() => {
                         const statusMessage = formStatus.querySelector('div');
                         statusMessage.classList.add('opacity-0');
@@ -837,7 +1251,7 @@
                     }, 5000);
                 }, 1500);
             });
-        });        // Add active class to nav links on scroll
+        });       
         document.addEventListener('DOMContentLoaded', function() {
             const sections = document.querySelectorAll('section');
             const navLinks = document.querySelectorAll('nav a[href^="#"]');

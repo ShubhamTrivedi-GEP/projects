@@ -1,0 +1,2001 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PodcastHub - Your Podcast Destination</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">    <style>
+        :root {
+            --primary-color: #7c4dff;
+            --primary-light: #9e7fff;
+            --primary-dark: #5e35b1;
+            --secondary-color: #ff5252;
+            --text-color: #333;
+            --text-secondary: #666;
+            --bg-color: #f5f7fa;
+            --card-bg: #fff;
+            --border-color: #e6e8ee;
+            --border-radius: 12px;
+            --shadow-color: rgba(0, 0, 0, 0.08);
+            --player-bg: #fff;
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --header-height: 70px;
+            --player-height: 90px;
+        }
+
+        .dark-theme {
+            --primary-color: #9e7fff;
+            --primary-light: #b4a1ff;
+            --primary-dark: #7c4dff;
+            --secondary-color: #ff7070;
+            --text-color: #e0e0e0;
+            --text-secondary: #aaa;
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --border-color: #2c2c2c;
+            --shadow-color: rgba(0, 0, 0, 0.25);
+            --player-bg: #1e1e1e;
+        }   
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            background-image: linear-gradient(135deg, rgba(124, 77, 255, 0.03) 0%, rgba(255, 82, 82, 0.02) 100%);
+            transition: var(--transition);
+            padding-bottom: var(--player-height); /* Space for player */
+            line-height: 1.6;
+            font-size: 16px;
+            font-weight: 400;
+            min-height: 100vh;
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+        
+        .episode-card {
+            animation: fadeIn 0.6s ease-out forwards;
+            animation-delay: calc(var(--animation-order, 0) * 0.1s);
+            opacity: 0;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+            background-color: var(--card-bg);
+            box-shadow: 0 4px 20px var(--shadow-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: var(--transition);
+            height: var(--header-height);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            letter-spacing: -0.5px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .logo::after {
+            content: "";
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: var(--secondary-color);
+            right: -8px;
+            top: 8px;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            font-size: 1.3rem;
+            transition: var(--transition);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .theme-toggle:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+        
+        .dark-theme .theme-toggle:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }    
+        nav {
+            background-color: var(--card-bg);
+            padding: 1.5rem 2rem;
+            box-shadow: 0 4px 20px var(--shadow-color);
+            transition: var(--transition);
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        }
+        
+        @media (max-width: 768px) {
+            nav {
+                padding-top: calc(var(--header-height) + 0.5rem);
+            }
+        }        .nav-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-wrapper {
+                padding-top: 1.5rem;
+            }
+        }.nav-section {
+            margin-bottom: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-section {
+                padding-bottom: 1.5rem;
+                border-bottom: 1px solid var(--border-color);
+            }
+            
+            .nav-section:last-child {
+                border-bottom: none;
+            }
+        }
+
+        .nav-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+            font-size: 1rem;
+            letter-spacing: 0.02em;
+            position: relative;
+            display: inline-block;
+            padding-bottom: 0.5rem;
+        }
+        
+        .nav-title:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 30px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-light) 100%);
+            border-radius: 3px;
+        }        .nav-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.7rem;
+        }
+
+        .nav-item {
+            padding: 0.5rem 1rem;
+            background-color: var(--bg-color);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+            font-size: 0.95rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+        }
+          @media (max-width: 768px) {
+            .nav-items {
+                gap: 0.5rem;
+                flex-direction: column;
+            }
+            
+            .nav-item {
+                padding: 0.8rem 1rem;
+                font-size: 1rem;
+                width: 100%;
+                text-align: center;
+                box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+            }
+            
+            .nav-section {
+                margin-bottom: 1.5rem;
+                width: 100%;
+            }
+            
+            .nav-title {
+                font-size: 1.1rem;
+                margin-bottom: 0.8rem;
+                padding-bottom: 0.4rem;
+            }
+            
+            .nav-title:after {
+                width: 40px;
+            }
+        }
+
+        .nav-item:hover {
+            background-color: var(--primary-light);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(124, 77, 255, 0.15);
+        }
+          .nav-item.active {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(124, 77, 255, 0.25);
+        }
+          @media (max-width: 768px) {
+            .nav-item.active {
+                transform: scale(1.02);
+                font-weight: 600;
+            }
+            
+            .nav-item {
+                margin-bottom: 0.5rem; 
+                -webkit-tap-highlight-color: rgba(0,0,0,0); 
+            }
+            
+            .nav-item:last-child {
+                margin-bottom: 0;
+            }
+            
+            .nav-item:active {
+                opacity: 0.7; 
+            }
+        }
+        main {
+            max-width: 1300px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .episodes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        .episode-card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: 0 8px 30px var(--shadow-color);
+            transition: var(--transition);
+            position: relative;
+            border: 1px solid var(--border-color);
+        }
+
+        .episode-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px var(--shadow-color);
+        }
+        
+        .episode-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            opacity: 0;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease, opacity 0.3s ease;
+        }
+          .episode-card:hover::before {
+            transform: scaleX(1);
+            opacity: 1;
+        }
+        
+        .episode-card.selected::before {
+            transform: scaleX(1);
+            opacity: 1;
+            background: linear-gradient(90deg, var(--primary-dark) 0%, var(--secondary-color) 100%);
+        }
+
+        .episode-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .episode-card:hover .episode-image {
+            transform: scale(1.05);
+        }
+
+        .episode-info {
+            padding: 1.5rem;
+            position: relative;
+        }
+
+        .episode-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.7rem;
+            color: var(--text-color);
+            line-height: 1.4;
+        }
+
+        .episode-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.7rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }        .episode-description {
+            margin-bottom: 1.5rem;
+            font-size: 0.93rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-height: 4.8rem;
+        }
+
+        .episode-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .episode-rating {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .star {
+            color: #e0e0e0;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+
+        .star.filled {
+            color: #ffb400;
+        }
+        
+        .star:hover {
+            transform: scale(1.2);
+        }
+
+        .episode-controls {
+            display: flex;
+            gap: 0.8rem;
+        }
+
+        .control-btn {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            font-size: 1rem;
+            transition: var(--transition);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(0, 0, 0, 0.03);
+        }
+
+        .dark-theme .control-btn {
+            background-color: rgba(255, 255, 255, 0.05);  
+        }
+
+        .control-btn:hover {
+            color: var(--primary-color);
+            background-color: rgba(124, 77, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .control-btn.play-btn {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .control-btn.play-btn:hover {
+            background-color: var(--primary-dark);
+            box-shadow: 0 4px 8px rgba(124, 77, 255, 0.3);
+        }
+        .audio-player {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--player-bg);
+            padding: 0.8rem 2rem;
+            box-shadow: 0 -5px 25px var(--shadow-color);
+            display: flex;
+            align-items: center;
+            z-index: 1000;
+            transition: var(--transition);
+            height: var(--player-height);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .player-left {
+            display: flex;
+            align-items: center;
+            width: 30%;
+        }
+
+        .current-track-img {
+            width: 60px;
+            height: 60px;
+            border-radius: var(--border-radius);
+            margin-right: 1rem;
+            object-fit: cover;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .current-track-img:hover {
+            transform: scale(1.05);
+        }
+
+        .current-track-info {
+            flex-grow: 1;
+            min-width: 0;
+        }
+
+        .current-track-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 1rem;
+            color: var(--text-color);
+        }
+
+        .current-track-artist {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .player-center {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 40%;
+        }        .player-controls {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .player-btn {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1rem;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .player-btn.large {
+            font-size: 1.5rem;
+            width: 46px;
+            height: 46px;
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 4px 10px rgba(124, 77, 255, 0.3);
+        }
+        
+        .player-btn.large:hover {
+            background-color: var(--primary-dark);
+            transform: scale(1.05);
+        }
+
+        .player-btn:hover {
+            color: var(--primary-color);
+            background-color: rgba(124, 77, 255, 0.1);
+        }
+
+        .player-progress {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .progress-bar {
+            flex-grow: 1;
+            height: 5px;
+            background-color: rgba(124, 77, 255, 0.15);
+            border-radius: 3px;
+            overflow: hidden;
+            cursor: pointer;
+            position: relative;
+            transition: height 0.2s ease;
+        }
+        
+        .progress-bar:hover {
+            height: 7px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-light) 100%);
+            width: 0%;
+            border-radius: 3px;
+            position: relative;
+        }
+        
+        .progress-fill::after {
+            content: "";
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: white;
+            transition: all 0.2s ease;
+        }
+        
+        .progress-bar:hover .progress-fill::after {
+            width: 12px;
+            height: 12px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.3);
+        }
+
+        .time-display {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            min-width: 45px;
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .player-right {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            width: 30%;
+            justify-content: flex-end;
+        }        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }        .volume-slider {
+            width: 85px;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 4px;
+            background-color: rgba(124, 77, 255, 0.15);
+            border-radius: 2px;
+            outline: none;
+            transition: height 0.2s ease;
+        }
+        
+        .volume-slider:hover {
+            height: 6px;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: all 0.2s ease;
+        }
+        
+        .volume-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 2px 8px rgba(124, 77, 255, 0.4);
+        }
+        
+        .volume-slider::-moz-range-thumb {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: all 0.2s ease;
+        }
+        
+        .volume-slider::-moz-range-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 2px 8px rgba(124, 77, 255, 0.4);
+        }
+
+        .queue-container {
+            position: fixed;
+            right: -350px;
+            top: 0;
+            width: 350px;
+            height: 100vh;
+            background-color: var(--card-bg);
+            box-shadow: -5px 0 30px var(--shadow-color);
+            z-index: 200;
+            transition: var(--transition);
+            padding: 1.5rem;
+            overflow-y: auto;
+            border-left: 1px solid var(--border-color);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .queue-container.active {
+            right: 0;
+        }
+
+        .queue-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid var(--border-color);
+        }        .queue-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+
+        .close-queue {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            font-size: 1.2rem;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+        
+        .close-queue:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+        
+        .dark-theme .close-queue:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .queue-list {
+            list-style: none;
+        }
+
+        .queue-item {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid transparent;
+        }
+        
+        .queue-item:hover {
+            background-color: rgba(0, 0, 0, 0.03);
+            border-color: var(--border-color);
+            transform: translateX(-5px);
+        }
+        
+        .dark-theme .queue-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .queue-item-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            margin-right: 1rem;
+            object-fit: cover;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .queue-item-info {
+            flex-grow: 1;
+            min-width: 0;
+            padding-right: 0.5rem;
+        }
+
+        .queue-item-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 0.95rem;
+        }
+
+        .queue-item-artist {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }  
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 300;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: var(--border-radius);
+            max-width: 550px;
+            width: 90%;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+            transform: translateY(30px);
+            transition: transform 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+            border: 1px solid var(--border-color);
+        }
+        
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .modal-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 1.3rem;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            font-size: 1.2rem;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+        
+        .close-modal:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+        
+        .dark-theme .close-modal:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .share-options {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .share-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.7rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .share-option:hover {
+            transform: translateY(-5px);
+        }        .share-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 1.3rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+        
+        .share-icon:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .share-icon.facebook {
+            background: linear-gradient(45deg, #3b5998, #4c70ba);
+        }
+
+        .share-icon.twitter {
+            background: linear-gradient(45deg, #1da1f2, #40b8ff);
+        }
+
+        .share-icon.whatsapp {
+            background: linear-gradient(45deg, #25d366, #4ce38a);
+        }
+
+        .share-icon.email {
+            background: linear-gradient(45deg, #ea4335, #ff6d60);
+        }
+
+        .share-link {
+            width: 100%;
+            padding: 1rem 1.2rem;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin-bottom: 1.2rem;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            transition: border-color 0.25s ease;
+        }
+        
+        .share-link:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .copy-link {
+            padding: 0.9rem 1.5rem;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            display: block;
+            width: 100%;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            box-shadow: 0 4px 15px rgba(124, 77, 255, 0.25);
+        }
+
+        .copy-link:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(124, 77, 255, 0.3);
+        }        /* Mobile Menu */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+        
+        .mobile-menu-toggle:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+        
+        .dark-theme .mobile-menu-toggle:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }        /* Mobile Navigation Overlay */
+        .nav-overlay {
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 140;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            pointer-events: none;
+        }
+        
+        .nav-overlay.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+        
+        .close-mobile-nav {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 1.2rem;
+            cursor: pointer;
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+        
+        .close-mobile-nav:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+            transform: rotate(90deg);
+        }
+        
+        .dark-theme .close-mobile-nav:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .close-mobile-nav {
+                display: flex;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .episodes-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 1.5rem;
+            }
+            
+            main {
+                padding: 0 1.5rem;
+                margin: 1.5rem auto;
+            }
+
+            header {
+                padding: 0 1.5rem;
+            }
+
+            .player-left {
+                width: 25%;
+            }
+
+            .player-center {
+                width: 50%;
+            }
+
+            .player-right {
+                width: 25%;
+            }            nav {
+                position: fixed;
+                top: 0;
+                left: -320px;
+                width: 320px;
+                height: 100vh;
+                z-index: 150;
+                transition: var(--transition);
+                overflow-y: auto;
+                border-radius: 0;
+                background-color: var(--card-bg);
+                padding-top: calc(var(--header-height) + 1rem);
+                padding-bottom: calc(var(--player-height) + 6rem);  
+            }
+
+            nav.active {
+                left: 0;
+                box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            }
+              nav::after {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background: rgba(0,0,0,0.5);
+                z-index: -1;
+                opacity: 0;
+                visibility: hidden;
+                transition: var(--transition);
+                backdrop-filter: blur(3px);
+                -webkit-backdrop-filter: blur(3px);
+            }
+            
+            nav.active::after {
+                opacity: 1;
+                visibility: visible;
+            }
+              @media (max-width: 768px) {
+                nav::after {
+                    display: none;
+                }
+            }
+
+            .mobile-menu-toggle {
+                display: flex;
+            }
+
+            .audio-player {
+                padding: 0.8rem 1.5rem;
+            }            .current-track-img {
+                width: 45px;
+                height: 45px;
+            }
+
+            .volume-control {
+                display: none;
+            }
+            
+            .queue-container {
+                width: 300px;
+                right: -300px;
+                padding: 1.2rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .episodes-grid {
+                grid-template-columns: 1fr;
+                gap: 1.2rem;
+            }
+            
+            main {
+                padding: 0 1.2rem;
+                margin: 1.2rem auto;
+            }
+            
+            header {
+                padding: 0 1.2rem;
+            }
+
+            .player-left {
+                width: 20%;
+            }
+
+            .player-center {
+                width: 60%;
+            }
+
+            .player-right {
+                width: 20%;
+            }
+
+            .current-track-title, .current-track-artist {
+                display: none;
+            }
+
+            .player-speed {
+                display: none;
+            }
+
+            .audio-player {
+                padding: 0.5rem 1rem;
+            }
+            
+            .player-btn {
+                width: 30px;
+                height: 30px;
+                font-size: 0.9rem;
+            }
+            
+            .player-btn.large {
+                width: 40px;
+                height: 40px;
+                font-size: 1.3rem;
+            }
+            
+            .player-controls {
+                gap: 0.8rem;
+            }
+            
+            .progress-bar {
+                height: 4px;
+            }
+            
+            .time-display {
+                font-size: 0.75rem;
+                min-width: 35px;
+            }
+            
+            .modal-content {
+                padding: 1.5rem;
+            }
+            
+            .share-options {
+                gap: 1rem;
+            }
+            
+            .share-icon {
+                width: 45px;
+                height: 45px;
+                font-size: 1.1rem;
+            }
+            
+            .queue-container {
+                width: 280px;
+                right: -280px;
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body class="light-theme">    <header>
+        <button class="mobile-menu-toggle" id="mobileMenuToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="logo">PodcastHub</div>
+        <button class="theme-toggle" id="themeToggle">
+            <i class="fas fa-moon"></i>
+        </button>
+    </header>
+    
+    <div class="nav-overlay" id="navOverlay"></div>
+      <nav id="navigation">
+        <div class="nav-wrapper">
+            <button class="close-mobile-nav" id="closeMobileNav">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="nav-section">
+                <div class="nav-title">Genres</div>
+                <div class="nav-items" id="genreNav">
+                    <div class="nav-item active" data-genre="all">All</div>
+                    <div class="nav-item" data-genre="technology">Technology</div>
+                    <div class="nav-item" data-genre="science">Science</div>
+                    <div class="nav-item" data-genre="business">Business</div>
+                    <div class="nav-item" data-genre="comedy">Comedy</div>
+                    <div class="nav-item" data-genre="health">Health</div>
+                </div>
+            </div>
+            <div class="nav-section">
+                <div class="nav-title">My Subscriptions</div>
+                <div class="nav-items" id="subscriptionNav">
+                    <div class="nav-item" data-sub="techTalk">Tech Talk</div>
+                    <div class="nav-item" data-sub="scienceDaily">Science Daily</div>
+                    <div class="nav-item" data-sub="comedyHour">Comedy Hour</div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <main>
+        <div class="episodes-grid" id="episodesGrid">
+        </div>
+    </main>
+    
+    <div class="audio-player" id="audioPlayer">
+        <div class="player-left">
+            <img class="current-track-img" id="currentTrackImg" src="https://via.placeholder.com/60" alt="Current track">
+            <div class="current-track-info">
+                <div class="current-track-title" id="currentTrackTitle">Select a podcast</div>
+                <div class="current-track-artist" id="currentTrackArtist">No podcast playing</div>
+            </div>
+        </div>
+        <div class="player-center">
+            <div class="player-controls">
+                <button class="player-btn" id="prevBtn">
+                    <i class="fas fa-step-backward"></i>
+                </button>
+                <button class="player-btn large" id="playPauseBtn">
+                    <i class="fas fa-play"></i>
+                </button>
+                <button class="player-btn" id="nextBtn">
+                    <i class="fas fa-step-forward"></i>
+                </button>
+                <button class="player-btn" id="queueBtn">
+                    <i class="fas fa-list"></i>
+                </button>
+            </div>
+            <div class="player-progress">
+                <span class="time-display" id="currentTime">0:00</span>
+                <div class="progress-bar" id="progressBar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <span class="time-display" id="totalTime">0:00</span>
+            </div>
+        </div>
+        <div class="player-right">
+            <div class="volume-control">
+                <button class="player-btn" id="muteBtn">
+                    <i class="fas fa-volume-up"></i>
+                </button>
+                <input type="range" class="volume-slider" id="volumeSlider" min="0" max="1" step="0.01" value="1">
+            </div>
+            <div class="player-speed" id="speedControl">
+                <button class="player-btn">
+                    <span id="speedDisplay">1x</span>
+                </button>
+            </div>
+        </div>
+        <audio id="audioElement"></audio>
+    </div>
+    
+    <div class="queue-container" id="queueContainer">
+        <div class="queue-header">
+            <div class="queue-title">Up Next</div>
+            <button class="close-queue" id="closeQueue">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <ul class="queue-list" id="queueList">
+        </ul>
+    </div>
+    
+    <div class="modal" id="shareModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Share This Episode</div>
+                <button class="close-modal" id="closeShareModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="share-options">
+                <div class="share-option" data-platform="facebook">
+                    <div class="share-icon facebook">
+                        <i class="fab fa-facebook-f"></i>
+                    </div>
+                    <span>Facebook</span>
+                </div>
+                <div class="share-option" data-platform="twitter">
+                    <div class="share-icon twitter">
+                        <i class="fab fa-twitter"></i>
+                    </div>
+                    <span>Twitter</span>
+                </div>
+                <div class="share-option" data-platform="whatsapp">
+                    <div class="share-icon whatsapp">
+                        <i class="fab fa-whatsapp"></i>
+                    </div>
+                    <span>WhatsApp</span>
+                </div>
+                <div class="share-option" data-platform="email">
+                    <div class="share-icon email">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <span>Email</span>
+                </div>
+            </div>
+            <input type="text" class="share-link" id="shareLink" readonly>
+            <button class="copy-link" id="copyLink">Copy Link</button>
+        </div>
+    </div>
+    
+    <script>
+        const podcastEpisodes = [
+            {
+                id: 1,
+                title: "The Future of AI",
+                description: "Exploring the latest advancements in artificial intelligence and what the future holds.",
+                duration: "45:12",
+                date: "2023-05-15",
+                image: "https://miro.medium.com/v2/resize:fit:900/1*57YDg0EsnSBYsTnwYPkSDg.jpeg",
+                audio: "https://assets.mixkit.co/music/695/695.mp3",
+                genre: "technology",
+                podcast: "Tech Talk",
+                rating: 4.5
+            },
+            {
+                id: 2,
+                title: "Black Holes Explained",
+                description: "Understanding the mysterious cosmic phenomenon of black holes and their impact on space-time.",
+                duration: "38:25",
+                date: "2023-05-10",
+                image: "https://news.uchicago.edu/sites/default/files/styles/full_width/public/images/2022-10/ligo-black-hole-merger-1380x776.jpeg?itok=--KCp-ci",
+                audio: "https://assets.mixkit.co/music/371/371.mp3",
+                genre: "science",
+                podcast: "Science Daily",
+                rating: 4.8
+            },
+            {
+                id: 3,
+                title: "Startup Success Stories",
+                description: "Inspiring tales of entrepreneurs who turned their ideas into successful businesses.",
+                duration: "52:40",
+                date: "2023-05-05",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_loteD2UWbltLaymUuv1cC2XiNlqvlj7OLQ&s",
+                audio: "https://assets.mixkit.co/music/1067/1067.mp3",
+                genre: "business",
+                podcast: "Business Insider",
+                rating: 4.2
+            },
+            {
+                id: 4,
+                title: "Comedy Hour: Dad Jokes",
+                description: "A hilarious compilation of the best dad jokes that will make you laugh and cringe.",
+                duration: "33:18",
+                date: "2023-04-30",
+                image: "https://media-cldnry.s-nbcnews.com/image/upload/t_fit-760w,f_auto,q_auto:best/rockcms/2025-01/dad-jokes-swl-250102-02-ea758e.jpg",
+                audio: "https://assets.mixkit.co/music/963/963.mp3",
+                genre: "comedy",
+                podcast: "Comedy Hour",
+                rating: 4.7
+            },
+            {
+                id: 5,
+                title: "Health Myths Debunked",
+                description: "Medical experts debunk common health myths and provide evidence-based advice.",
+                duration: "41:55",
+                date: "2023-04-25",
+                image: "https://res.cloudinary.com/baptisthealth/image/upload/f_auto,q_auto/v1551451003/journalism/images/health-mythsjuice.jpg",
+                audio: "https://assets.mixkit.co/music/284/284.mp3",
+                genre: "health",
+                podcast: "Health Today",
+                rating: 4.6
+            },
+            {
+                id: 6,
+                title: "Blockchain Revolution",
+                description: "How blockchain technology is changing finance, supply chains, and more.",
+                duration: "47:30",
+                date: "2023-04-20",
+                image: "https://dontapscott.com/wp-content/uploads/1-sXZjRCKO7veIAEs_uT1lRQ.png",
+                audio: "https://assets.mixkit.co/music/174/174.mp3",
+                genre: "technology",
+                podcast: "Tech Talk",
+                rating: 4.3
+            }
+        ];
+        const themeToggle = document.getElementById('themeToggle');
+        const episodesGrid = document.getElementById('episodesGrid');
+        const genreNav = document.getElementById('genreNav');
+        const subscriptionNav = document.getElementById('subscriptionNav');
+        const audioElement = document.getElementById('audioElement');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const closeMobileNav = document.getElementById('closeMobileNav');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const muteBtn = document.getElementById('muteBtn');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const progressBar = document.getElementById('progressBar');
+        const progressFill = document.getElementById('progressFill');
+        const currentTime = document.getElementById('currentTime');
+        const totalTime = document.getElementById('totalTime');
+        const currentTrackImg = document.getElementById('currentTrackImg');
+        const currentTrackTitle = document.getElementById('currentTrackTitle');
+        const currentTrackArtist = document.getElementById('currentTrackArtist');
+        const speedControl = document.getElementById('speedControl');
+        const speedDisplay = document.getElementById('speedDisplay');
+        const queueBtn = document.getElementById('queueBtn');
+        const queueContainer = document.getElementById('queueContainer');
+        const closeQueue = document.getElementById('closeQueue');
+        const queueList = document.getElementById('queueList');
+        const shareModal = document.getElementById('shareModal');
+        const closeShareModal = document.getElementById('closeShareModal');
+        const shareLink = document.getElementById('shareLink');
+        const copyLink = document.getElementById('copyLink');
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        const navigation = document.getElementById('navigation');
+
+        let currentEpisode = null;
+        let isPlaying = false;
+        let queue = [];
+        let filteredEpisodes = [...podcastEpisodes];
+        let activeGenre = 'all';
+        let userRatings = {};
+        let speedRates = [0.5, 0.75, 1, 1.25, 1.5, 2];
+        let currentSpeedIndex = 2;        function initApp() {
+            loadEpisodes(filteredEpisodes);
+            setupEventListeners();
+            loadThemePreference();
+        }
+        function loadEpisodes(episodes) {
+            episodesGrid.innerHTML = '';
+            
+            episodes.forEach((episode, index) => {
+                const episodeCard = document.createElement('div');
+                episodeCard.className = 'episode-card';
+                episodeCard.setAttribute('data-id', episode.id);
+                episodeCard.style.setProperty('--animation-order', index);
+                
+                episodeCard.innerHTML = `
+                    <img src="${episode.image}" alt="${episode.title}" class="episode-image">
+                    <div class="episode-info">
+                        <h3 class="episode-title">${episode.title}</h3>
+                        <div class="episode-meta">
+                            <span><i class="fas fa-podcast"></i> ${episode.podcast}</span>
+                            <span><i class="far fa-clock"></i> ${episode.duration}</span>
+                        </div>
+                        <p class="episode-description">${episode.description}</p>
+                        <div class="episode-actions">
+                            <div class="episode-rating" data-id="${episode.id}">
+                                ${generateStars(episode.id, episode.rating)}
+                            </div>
+                            <div class="episode-controls">
+                                <button class="control-btn play-btn" data-id="${episode.id}" title="Play episode">
+                                    <i class="fas fa-play"></i>
+                                </button>
+                                <button class="control-btn queue-btn" data-id="${episode.id}" title="Add to queue">
+                                    <i class="fas fa-list-alt"></i>
+                                </button>
+                                <button class="control-btn share-btn" data-id="${episode.id}" title="Share episode">
+                                    <i class="fas fa-share-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                episodesGrid.appendChild(episodeCard);
+            });
+            
+            document.querySelectorAll('.play-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const episodeId = parseInt(this.getAttribute('data-id'));
+                    const episode = podcastEpisodes.find(ep => ep.id === episodeId);
+                    playEpisode(episode);
+                });
+            });
+            
+            document.querySelectorAll('.queue-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const episodeId = parseInt(this.getAttribute('data-id'));
+                    const episode = podcastEpisodes.find(ep => ep.id === episodeId);
+                    addToQueue(episode);
+                });
+            });
+            
+            document.querySelectorAll('.share-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const episodeId = parseInt(this.getAttribute('data-id'));
+                    openShareModal(episodeId);
+                });
+            });
+            
+            document.querySelectorAll('.star').forEach(star => {
+                star.addEventListener('click', function() {
+                    const episodeId = parseInt(this.parentElement.getAttribute('data-id'));
+                    const rating = parseInt(this.getAttribute('data-value'));
+                    rateEpisode(episodeId, rating);
+                });
+            });
+        }
+
+        function generateStars(episodeId, rating) {
+            let stars = '';
+            const userRating = userRatings[episodeId] || rating;
+            
+            for (let i = 1; i <= 5; i++) {
+                const filled = i <= Math.round(userRating) ? 'filled' : '';
+                stars += `<i class="fas fa-star star ${filled}" data-value="${i}"></i>`;
+            }
+            
+            return stars;
+        }        function playEpisode(episode) {
+            currentEpisode = episode;
+            audioElement.src = episode.audio;
+            audioElement.play();
+            isPlaying = true;
+            updatePlayPauseButton();
+            updateCurrentTrackInfo();
+            
+            document.querySelectorAll('.episode-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            const selectedCard = document.querySelector(`.episode-card[data-id="${episode.id}"]`);
+            if (selectedCard) {
+                selectedCard.classList.add('selected');
+            }
+        }
+
+        function addToQueue(episode) {
+            if (!queue.some(ep => ep.id === episode.id)) {
+                queue.push(episode);
+                updateQueueDisplay();
+                
+                showNotification(`Added "${episode.title}" to queue`);
+            }
+        }
+
+        function updateQueueDisplay() {
+            queueList.innerHTML = '';
+            
+            if (queue.length === 0) {
+                queueList.innerHTML = '<li class="queue-item">Queue is empty</li>';
+                return;
+            }
+            
+            queue.forEach((episode, index) => {
+                const queueItem = document.createElement('li');
+                queueItem.className = 'queue-item';
+                
+                queueItem.innerHTML = `
+                    <img src="${episode.image}" alt="${episode.title}" class="queue-item-img">
+                    <div class="queue-item-info">
+                        <div class="queue-item-title">${episode.title}</div>
+                        <div class="queue-item-artist">${episode.podcast}</div>
+                    </div>
+                    <button class="control-btn remove-queue-btn" data-index="${index}">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                
+                queueList.appendChild(queueItem);
+            });
+            
+            document.querySelectorAll('.remove-queue-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const index = parseInt(this.getAttribute('data-index'));
+                    queue.splice(index, 1);
+                    updateQueueDisplay();
+                });
+            });
+            
+            document.querySelectorAll('.queue-item').forEach((item, index) => {
+                item.addEventListener('click', function() {
+                    if (index < queue.length) {
+                        playEpisode(queue[index]);
+                        queue.splice(index, 1);
+                        updateQueueDisplay();
+                    }
+                });
+            });
+        }
+
+        function openShareModal(episodeId) {
+            const episode = podcastEpisodes.find(ep => ep.id === episodeId);
+            shareLink.value = `https://podcasthub.example/episode/${episodeId}`;
+            shareModal.classList.add('active');
+            
+            document.querySelector('.modal-title').textContent = `Share: ${episode.title}`;
+        }
+
+        function rateEpisode(episodeId, rating) {
+            userRatings[episodeId] = rating;
+            
+            const starsContainer = document.querySelector(`.episode-rating[data-id="${episodeId}"]`);
+            starsContainer.innerHTML = generateStars(episodeId, rating);
+            
+            starsContainer.querySelectorAll('.star').forEach(star => {
+                star.addEventListener('click', function() {
+                    const rating = parseInt(this.getAttribute('data-value'));
+                    rateEpisode(episodeId, rating);
+                });
+            });
+            
+            const episode = podcastEpisodes.find(ep => ep.id === episodeId);
+            showNotification(`Rated "${episode.title}" ${rating} stars`);
+        }
+
+        function filterByGenre(genre) {
+            activeGenre = genre;
+            
+            if (genre === 'all') {
+                filteredEpisodes = [...podcastEpisodes];
+            } else {
+                filteredEpisodes = podcastEpisodes.filter(ep => ep.genre === genre);
+            }
+            
+            loadEpisodes(filteredEpisodes);
+        }
+
+        function filterBySubscription(podcastName) {
+            filteredEpisodes = podcastEpisodes.filter(ep => ep.podcast === podcastName);
+            loadEpisodes(filteredEpisodes);
+            document.querySelectorAll('#genreNav .nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+        }
+
+        function updateCurrentTrackInfo() {
+            if (currentEpisode) {
+                currentTrackImg.src = currentEpisode.image;
+                currentTrackTitle.textContent = currentEpisode.title;
+                currentTrackArtist.textContent = currentEpisode.podcast;
+            } else {
+                currentTrackImg.src = 'https://via.placeholder.com/60';
+                currentTrackTitle.textContent = 'Select a podcast';
+                currentTrackArtist.textContent = 'No podcast playing';
+            }
+        }
+
+        function updatePlayPauseButton() {
+            if (isPlaying) {
+                playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            } else {
+                playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+            }
+        }
+
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+        }        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.style.position = 'fixed';
+            notification.style.top = '30px';
+            notification.style.right = '30px';
+            notification.style.backgroundColor = 'var(--card-bg)';
+            notification.style.color = 'var(--text-color)';
+            notification.style.padding = '15px 25px';
+            notification.style.borderRadius = 'var(--border-radius)';
+            notification.style.zIndex = '1000';
+            notification.style.opacity = '0';
+            notification.style.transform = 'translateY(20px)';
+            notification.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+            notification.style.boxShadow = '0 10px 30px var(--shadow-color)';
+            notification.style.border = '1px solid var(--border-color)';
+            notification.style.fontSize = '0.95rem';
+            notification.style.backdropFilter = 'blur(10px)';
+            notification.style.WebkitBackdropFilter = 'blur(10px)';
+            
+            const iconType = message.includes('Rated') ? 'fa-star' : message.includes('Added') ? 'fa-plus-circle' : 'fa-bell';
+            
+            notification.innerHTML = `
+                <div style="display: flex; align-items: center;">
+                    <i class="fas ${iconType}" style="color: var(--primary-color); margin-right: 10px; font-size: 1.2rem;"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '1';
+                notification.style.transform = 'translateY(0)';
+            }, 10);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        function loadThemePreference() {
+            const darkMode = localStorage.getItem('darkMode') === 'true';
+            if (darkMode) {
+                document.body.classList.add('dark-theme');
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            } else {
+                document.body.classList.remove('dark-theme');
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+            }
+        }
+
+        function toggleTheme() {
+            const isDarkMode = document.body.classList.toggle('dark-theme');
+            
+            if (isDarkMode) {
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                localStorage.setItem('darkMode', 'true');
+            } else {
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+                localStorage.setItem('darkMode', 'false');
+            }
+        }
+
+        function setupEventListeners() {
+            themeToggle.addEventListener('click', toggleTheme);            const navOverlay = document.getElementById('navOverlay');
+            
+            mobileMenuToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                navigation.classList.toggle('active');
+                navOverlay.classList.toggle('active');
+                document.body.style.overflow = navigation.classList.contains('active') ? 'hidden' : '';
+            });
+            document.addEventListener('click', function(e) {
+                if (navigation.classList.contains('active') && 
+                    !navigation.contains(e.target) && 
+                    e.target !== mobileMenuToggle &&
+                    !mobileMenuToggle.contains(e.target)) {
+                    navigation.classList.remove('active');
+                    navOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
+            navOverlay.addEventListener('click', function() {
+                navigation.classList.remove('active');
+                navOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+            
+            closeMobileNav.addEventListener('click', function() {
+                navigation.classList.remove('active');
+                navOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            });genreNav.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    genreNav.querySelectorAll('.nav-item').forEach(navItem => {
+                        navItem.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                    
+                    const genre = this.getAttribute('data-genre');
+                    filterByGenre(genre);
+                    
+                    if (window.innerWidth <= 768) {
+                        navigation.classList.remove('active');
+                        navOverlay.classList.remove('active');
+                        document.body.style.overflow = '';
+                    }
+                });
+            });
+              subscriptionNav.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    subscriptionNav.querySelectorAll('.nav-item').forEach(navItem => {
+                        navItem.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                    
+                    const podcast = this.getAttribute('data-sub');
+                    let podcastName;
+                    
+                    switch (podcast) {
+                        case 'techTalk':
+                            podcastName = 'Tech Talk';
+                            break;
+                        case 'scienceDaily':
+                            podcastName = 'Science Daily';
+                            break;
+                        case 'comedyHour':
+                            podcastName = 'Comedy Hour';
+                            break;
+                        default:
+                            podcastName = '';
+                    }
+                    
+                    filterBySubscription(podcastName);
+                    
+                    if (window.innerWidth <= 768) {
+                        navigation.classList.remove('active');
+                        navOverlay.classList.remove('active');
+                        document.body.style.overflow = '';
+                    }
+                });
+            });
+            
+            playPauseBtn.addEventListener('click', function() {
+                if (!currentEpisode) return;
+                
+                if (isPlaying) {
+                    audioElement.pause();
+                    isPlaying = false;
+                } else {
+                    audioElement.play();
+                    isPlaying = true;
+                }
+                
+                updatePlayPauseButton();
+            });
+            
+            prevBtn.addEventListener('click', function() {
+                audioElement.currentTime = Math.max(0, audioElement.currentTime - 10);
+            });
+            
+            nextBtn.addEventListener('click', function() {
+                if (queue.length > 0) {
+                    const nextEpisode = queue.shift();
+                    playEpisode(nextEpisode);
+                    updateQueueDisplay();
+                } else {
+                    audioElement.currentTime = Math.min(audioElement.duration, audioElement.currentTime + 10);
+                }
+            });
+            
+            muteBtn.addEventListener('click', function() {
+                audioElement.muted = !audioElement.muted;
+                
+                if (audioElement.muted) {
+                    muteBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
+                } else {
+                    muteBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+                }
+            });
+            
+            volumeSlider.addEventListener('input', function() {
+                audioElement.volume = this.value;
+                
+                if (this.value === '0') {
+                    muteBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
+                } else if (this.value < 0.5) {
+                    muteBtn.innerHTML = '<i class="fas fa-volume-down"></i>';
+                } else {
+                    muteBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+                }
+            });
+            
+            progressBar.addEventListener('click', function(e) {
+                if (!currentEpisode) return;
+                
+                const rect = this.getBoundingClientRect();
+                const pos = (e.clientX - rect.left) / rect.width;
+                audioElement.currentTime = pos * audioElement.duration;
+            });
+            
+            speedControl.addEventListener('click', function() {
+                currentSpeedIndex = (currentSpeedIndex + 1) % speedRates.length;
+                const newRate = speedRates[currentSpeedIndex];
+                audioElement.playbackRate = newRate;
+                speedDisplay.textContent = `${newRate}x`;
+            });
+            
+            audioElement.addEventListener('timeupdate', function() {
+                const currentTimeValue = formatTime(audioElement.currentTime);
+                const totalTimeValue = formatTime(audioElement.duration || 0);
+                
+                currentTime.textContent = currentTimeValue;
+                totalTime.textContent = totalTimeValue;
+                
+                const progress = audioElement.currentTime / (audioElement.duration || 1);
+                progressFill.style.width = `${progress * 100}%`;
+            });
+            
+            audioElement.addEventListener('ended', function() {
+                if (queue.length > 0) {
+                    const nextEpisode = queue.shift();
+                    playEpisode(nextEpisode);
+                    updateQueueDisplay();
+                } else {
+                    isPlaying = false;
+                    updatePlayPauseButton();
+                }
+            });
+            
+            queueBtn.addEventListener('click', function() {
+                queueContainer.classList.toggle('active');
+            });
+            
+            closeQueue.addEventListener('click', function() {
+                queueContainer.classList.remove('active');
+            });
+            
+            closeShareModal.addEventListener('click', function() {
+                shareModal.classList.remove('active');
+            });
+            
+            copyLink.addEventListener('click', function() {
+                shareLink.select();
+                document.execCommand('copy');
+                this.textContent = 'Copied!';
+                
+                setTimeout(() => {
+                    this.textContent = 'Copy Link';
+                }, 2000);
+            });
+            
+            document.querySelectorAll('.share-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    const platform = this.getAttribute('data-platform');
+                    const link = shareLink.value;
+                    let shareUrl = '';
+                    
+                    switch (platform) {
+                        case 'facebook':
+                            shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}`;
+                            break;
+                        case 'twitter':
+                            shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(link)}`;
+                            break;
+                        case 'whatsapp':
+                            shareUrl = `https://wa.me/?text=${encodeURIComponent(link)}`;
+                            break;
+                        case 'email':
+                            shareUrl = `mailto:?body=${encodeURIComponent(link)}`;
+                            break;
+                    }
+                    
+                    if (shareUrl) {
+                        window.open(shareUrl, '_blank');
+                    }
+                });
+            });
+            
+            window.addEventListener('click', function(e) {
+                if (e.target === shareModal) {
+                    shareModal.classList.remove('active');
+                }
+                
+                if (navigation.classList.contains('active') && !navigation.contains(e.target) && e.target !== mobileMenuToggle) {
+                    navigation.classList.remove('active');
+                }
+            });
+        }        function setupAnimations() {
+            document.querySelectorAll('.episode-card').forEach((card, index) => {
+                card.style.setProperty('--animation-order', index);
+            });
+        }
+        
+        function loadFirstEpisode() {
+            if (filteredEpisodes.length > 0) {
+                currentEpisode = filteredEpisodes[0];
+                audioElement.src = currentEpisode.audio;
+                updateCurrentTrackInfo();
+                
+                const firstCard = document.querySelector(`.episode-card[data-id="${currentEpisode.id}"]`);
+                if (firstCard) {
+                    firstCard.classList.add('selected');
+                }
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            initApp();
+            setupAnimations();
+            loadFirstEpisode();
+        });
+    </script>
+</body>
+</html>
